@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>http://blog.coocn.cn/categories/index.html</loc>
+    
+    <lastmod>2020-03-25T02:58:44.882Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/tags/index.html</loc>
+    
+    <lastmod>2020-03-25T02:57:33.335Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/c-setlocale/</loc>
+    
+    <lastmod>2020-03-25T02:29:35.130Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/docker-ssserver/</loc>
+    
+    <lastmod>2020-03-25T02:27:05.613Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/git-clone-depth/</loc>
+    
+    <lastmod>2020-03-25T02:21:16.244Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/linux-buffer-cache/</loc>
+    
+    <lastmod>2020-03-25T02:20:22.861Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/k8s-configmap-mount/</loc>
+    
+    <lastmod>2020-03-25T02:16:42.378Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/gitlab-ci-config-file/</loc>
+    
+    <lastmod>2020-03-25T02:12:44.465Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/k8s-metrics-server-error-1/</loc>
+    
+    <lastmod>2020-03-25T02:09:33.350Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/k8s-coredns-add-hosts/</loc>
+    
+    <lastmod>2020-03-25T02:01:18.958Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/git-nouns/</loc>
+    
+    <lastmod>2020-03-25T01:49:43.245Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/micro-server-introduction/</loc>
+    
+    <lastmod>2020-03-25T01:47:15.130Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/https-redirect-and-hack/</loc>
+    
+    <lastmod>2020-03-25T01:44:45.568Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/golang-micro-3/</loc>
+    
+    <lastmod>2020-03-25T01:44:42.683Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/golang-micro-2/</loc>
+    
+    <lastmod>2020-03-25T01:44:39.492Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/golang-micro-1/</loc>
+    
+    <lastmod>2020-03-25T01:30:07.055Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/office-2019-install/</loc>
+    
+    <lastmod>2020-03-25T01:21:57.535Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/24/mono-repo-vs-multi-repo/</loc>
+    
+    <lastmod>2020-03-25T01:12:02.038Z</lastmod>
+    
+  </url>
+  
+</urlset>
