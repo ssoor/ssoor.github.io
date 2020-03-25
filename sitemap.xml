@@ -2,6 +2,111 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.coocn.cn/2020/03/25/etcd-addpeer-and-forcestartcluster/</loc>
+    
+    <lastmod>2020-03-25T07:59:13.483Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/k8s-loadbalancer/</loc>
+    
+    <lastmod>2020-03-25T07:56:25.756Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/envoy-manage-endpoint/</loc>
+    
+    <lastmod>2020-03-25T07:55:19.341Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/ceph-deploy-use-docker/</loc>
+    
+    <lastmod>2020-03-25T07:52:26.772Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/k8s-dns-nodata/</loc>
+    
+    <lastmod>2020-03-25T07:50:54.355Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/k8s-internal-registry-403/</loc>
+    
+    <lastmod>2020-03-25T07:50:20.621Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/golang-build-remove-gopath/</loc>
+    
+    <lastmod>2020-03-25T07:49:42.006Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/linux-file-prefetch/</loc>
+    
+    <lastmod>2020-03-25T07:49:06.368Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/k8s-secret/</loc>
+    
+    <lastmod>2020-03-25T07:43:42.684Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/golang-prometheus-metrics/</loc>
+    
+    <lastmod>2020-03-25T07:43:19.174Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/https-ssl/</loc>
+    
+    <lastmod>2020-03-25T07:42:35.196Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/golang-debug-squash/</loc>
+    
+    <lastmod>2020-03-25T07:37:00.394Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/socket-tcp/</loc>
+    
+    <lastmod>2020-03-25T07:36:01.025Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/ceph-tgt-iscsi-target/</loc>
+    
+    <lastmod>2020-03-25T07:35:08.044Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.coocn.cn/2020/03/25/git-pull-vs-fetch/</loc>
+    
+    <lastmod>2020-03-25T07:33:38.800Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.coocn.cn/categories/index.html</loc>
     
     <lastmod>2020-03-25T02:58:44.882Z</lastmod>
