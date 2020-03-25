@@ -20,15 +20,19 @@
     var CONFIG = {"hostname":"blog.coocn.cn","root":"/","scheme":"Pisces","version":"7.7.2","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://blog.coocn.cn/archives/2020/index.html">
+  <meta name="description" content="缘由可能由于科学上网次数过多，发现公司网络被重点照顾了，v2ray和ssserver 都无法正常科学上网，所以想到了如下这个骚办法。  通过 SSH 隧道加上 ssserver 来达到绕过我墙对 ssserver 的封锁；为啥用 ssserver 呢，因为 ssserver 简单，好启动。  启动服务器此处只监听127.0.0.1避免被防火墙嗅探到外网端口。由于是使用ssh tunnel 访问，所">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 docker 通过 ssh tunnel + shadowoscks 绕过我墙实现科学上网">
+<meta property="og:url" content="http://blog.coocn.cn/2020/03/25/docker-ssserver/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="缘由可能由于科学上网次数过多，发现公司网络被重点照顾了，v2ray和ssserver 都无法正常科学上网，所以想到了如下这个骚办法。  通过 SSH 隧道加上 ssserver 来达到绕过我墙对 ssserver 的封锁；为啥用 ssserver 呢，因为 ssserver 简单，好启动。  启动服务器此处只监听127.0.0.1避免被防火墙嗅探到外网端口。由于是使用ssh tunnel 访问，所">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-03-25T02:24:52.000Z">
+<meta property="article:modified_time" content="2020-03-25T02:27:05.613Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://blog.coocn.cn/archives/2020/">
+<link rel="canonical" href="http://blog.coocn.cn/2020/03/25/docker-ssserver/">
 
 
 <script id="page-configurations">
@@ -36,12 +40,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>归档 | Hexo</title>
+  <title>使用 docker 通过 ssh tunnel + shadowoscks 绕过我墙实现科学上网 | Hexo</title>
   
 
 
@@ -199,239 +203,121 @@
         <div class="content-wrap">
           
 
-          <div class="content archive">
+          <div class="content post">
             
 
+  <div class="posts-expand">
+      
   
   
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.coocn.cn/2020/03/25/docker-ssserver/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/apple-touch-icon-next.png">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用 docker 通过 ssh tunnel + shadowoscks 绕过我墙实现科学上网
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-25 10:24:52 / 修改时间：10:27:05" itemprop="dateCreated datePublished" datetime="2020-03-25T10:24:52+08:00">2020-03-25</time>
+            </span>
+
+          
   
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <span class="collection-header">嗯..! 目前共计 16 篇日志。 继续努力。</span>
-      </div>
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/25/docker-ssserver/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/25/docker-ssserver/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2020</span>
+        <h1 id="缘由"><a href="#缘由" class="headerlink" title="缘由"></a>缘由</h1><p>可能由于科学上网次数过多，发现公司网络被重点照顾了，v2ray和ssserver 都无法正常科学上网，所以想到了如下这个骚办法。</p>
+<blockquote>
+<p>通过 SSH 隧道加上 ssserver 来达到绕过我墙对 ssserver 的封锁；为啥用 ssserver 呢，因为 ssserver 简单，好启动。</p>
+</blockquote>
+<h1 id="启动服务器"><a href="#启动服务器" class="headerlink" title="启动服务器"></a>启动服务器</h1><p>此处只监听<code>127.0.0.1</code>避免被防火墙嗅探到外网端口。由于是使用ssh tunnel 访问，所以端口不对外也没有任何问题。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p &quot;127.0.0.1:8388:8388&quot;-e &quot;METHOD&#x3D;xchacha20-ietf-poly1305&quot; -e &quot;PASSWORD&#x3D;&lt;password&gt;&quot; -e &quot;SERVER_ADDR&#x3D;0.0.0.0&quot; -e &quot;SERVER_PORT&#x3D;8388&quot; shadowsocks&#x2F;shadowsocks-libev</span><br></pre></td></tr></table></figure>
+
+<h1 id="启动客户端"><a href="#启动客户端" class="headerlink" title="启动客户端"></a>启动客户端</h1><h2 id="1-启动端口转发"><a href="#1-启动端口转发" class="headerlink" title="1. 启动端口转发"></a>1. 启动端口转发</h2><p>启动时指定名称为 <code>ss-tunnel</code>，因为 ss 客户端 需要连接这个容器。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run  -d --name ss-tunnel -v &#x2F;ssh&#x2F;:&#x2F;root&#x2F;.ssh ssoor&#x2F;ssh-tunnel ssh -CNTL 0.0.0.0:8388:127.0.0.1:8388 root@&lt;SERVER_IP&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="2-启动-SS-客户端"><a href="#2-启动-SS-客户端" class="headerlink" title="2. 启动 SS 客户端"></a>2. 启动 SS 客户端</h2><p>监听本地 1080 端口对外提供服务，<code>--link ss-tunnel</code> 表示要使用名称访问 <code>ss-tunnel</code> 容器 (<code>ss-local -s ss-tunnel -p 8388</code>)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --link ss-tunnel -p 1080:1080 shadowsocks&#x2F;shadowsocks-libev ss-local -s ss-tunnel -p 8388 -b 0.0.0.0 -l 1080 -m xchacha20-ietf-poly1305 -k &lt;password&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="愉快的玩耍"><a href="#愉快的玩耍" class="headerlink" title="愉快的玩耍"></a>愉快的玩耍</h1><p>现在可以设置 <code>SOCKS5</code> 代理 愉快的玩耍了。<br>比如使用GIT拉源码:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HTTPS_PROXY&#x3D;socks5:&#x2F;&#x2F;127.0.0.1:1080 git clone https:&#x2F;&#x2F;github.com&#x2F;golang&#x2F;go</span><br></pre></td></tr></table></figure>
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+    
+    
+    
 
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-03-25T10:28:37+08:00"
-              content="2020-03-25">
-          03-25
-        </time>
-      </div>
+      <footer class="post-footer">
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/03/25/c-setlocale/" itemprop="url">
-            <span itemprop="name">setlocale(LC_ALL,"") 中的 LC_* 是什么意思，以及 LANGUAGE/LANG 具体含义说明</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-03-25T10:24:52+08:00"
-              content="2020-03-25">
-          03-25
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/03/25/docker-ssserver/" itemprop="url">
-            <span itemprop="name">使用 docker 通过 ssh tunnel + shadowoscks 绕过我墙实现科学上网</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-03-25T10:21:09+08:00"
-              content="2020-03-25">
-          03-25
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/03/25/git-clone-depth/" itemprop="url">
-            <span itemprop="name">在 git clone 时添加了 --depth 后，如何重新拉取所有全部的历史来获取完整的仓库</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-03-25T10:17:39+08:00"
-              content="2020-03-25">
-          03-25
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/03/25/linux-buffer-cache/" itemprop="url">
-            <span itemprop="name">为什么 Linux buffer/cache 内存占用很高？具体原因以及解决办法</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-03-25T10:14:13+08:00"
-              content="2020-03-25">
-          03-25
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/03/25/k8s-configmap-mount/" itemprop="url">
-            <span itemprop="name">kubernetes 如何挂载 configMap 中的单个文件以及挂载时需要注意的相关事项</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-03-25T10:11:06+08:00"
-              content="2020-03-25">
-          03-25
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/03/25/gitlab-ci-config-file/" itemprop="url">
-            <span itemprop="name">Gitlab-CI 配置文件 .gitlab-ci.yml 详细说明，基于官方文档翻译</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-03-25T10:05:37+08:00"
-              content="2020-03-25">
-          03-25
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/03/25/k8s-metrics-server-error-1/" itemprop="url">
-            <span itemprop="name">kubernetes 部署 metrics-server 提示  no metrics known for pod 或者 x509: cannot validate certificate 的解决方案和详细原因分析</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-03-25T09:52:36+08:00"
-              content="2020-03-25">
-          03-25
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/03/25/k8s-coredns-add-hosts/" itemprop="url">
-            <span itemprop="name">通过 coredns 给 kubernetes 添加自定义DNS解析记录</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-03-25T09:48:39+08:00"
-              content="2020-03-25">
-          03-25
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/03/25/git-nouns/" itemprop="url">
-            <span itemprop="name">Git 团队协作中WIP PTAL CC LGTM IIRC 等常用术语含义解释</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-03-25T09:35:55+08:00"
-              content="2020-03-25">
-          03-25
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2020/03/25/micro-server-introduction/" itemprop="url">
-            <span itemprop="name">微服务优势和劣势分析，微服务相关概念及微服务架构优点缺点介绍</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
+        
 
 
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/25/git-clone-depth/" rel="prev" title="在 git clone 时添加了 --depth 后，如何重新拉取所有全部的历史来获取完整的仓库">
+      <i class="fa fa-chevron-left"></i> 在 git clone 时添加了 --depth 后，如何重新拉取所有全部的历史来获取完整的仓库
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/25/c-setlocale/" rel="next" title="setlocale(LC_ALL,"") 中的 LC_* 是什么意思，以及 LANGUAGE/LANG 具体含义说明">
+      setlocale(LC_ALL,"") 中的 LC_* 是什么意思，以及 LANGUAGE/LANG 具体含义说明 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
   </div>
-  
-  
-  
-
-  
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/archives/2020/page/2/">2</a><a class="extend next" rel="next" href="/archives/2020/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
-  </nav>
-
 
 
           </div>
           
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -478,6 +364,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#缘由"><span class="nav-number">1.</span> <span class="nav-text">缘由</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#启动服务器"><span class="nav-number">2.</span> <span class="nav-text">启动服务器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#启动客户端"><span class="nav-number">3.</span> <span class="nav-text">启动客户端</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-启动端口转发"><span class="nav-number">3.1.</span> <span class="nav-text">1. 启动端口转发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-启动-SS-客户端"><span class="nav-number">3.2.</span> <span class="nav-text">2. 启动 SS 客户端</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#愉快的玩耍"><span class="nav-number">4.</span> <span class="nav-text">愉快的玩耍</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -640,6 +527,26 @@ if (document.querySelectorAll('pre.mermaid').length) {
   }
   // defer loading until the whole page loading is completed
   window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://blog.coocn.cn/2020/03/25/docker-ssserver/";
+    this.page.identifier = "2020/03/25/docker-ssserver/";
+    this.page.title = "使用 docker 通过 ssh tunnel + shadowoscks 绕过我墙实现科学上网";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://theme-next.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
 </script>
 
 </body>

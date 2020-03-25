@@ -116,7 +116,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">2</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">16</span></a>
 
   </li>
         <li class="menu-item menu-item-about">
@@ -126,12 +126,12 @@
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">1</span></a>
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">3</span></a>
 
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">1</span></a>
 
   </li>
         <li class="menu-item menu-item-schedule">
@@ -207,7 +207,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.coocn.cn/2020/03/24/mono-repo-vs-multi-repo/">
+    <link itemprop="mainEntityOfPage" href="http://blog.coocn.cn/2020/03/25/c-setlocale/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/apple-touch-icon-next.png">
@@ -221,7 +221,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2020/03/24/mono-repo-vs-multi-repo/" class="post-title-link" itemprop="url">单体仓库与多仓库都有哪些优势劣势，微服务选择哪种方案比较好？</a>
+            <a href="/2020/03/25/c-setlocale/" class="post-title-link" itemprop="url">setlocale(LC_ALL,"") 中的 LC_* 是什么意思，以及 LANGUAGE/LANG 具体含义说明</a>
         </h2>
 
         <div class="post-meta">
@@ -232,7 +232,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-03-24 18:40:36 / 修改时间：19:18:22" itemprop="dateCreated datePublished" datetime="2020-03-24T18:40:36+08:00">2020-03-24</time>
+              <time title="创建时间：2020-03-25 10:28:37 / 修改时间：10:29:35" itemprop="dateCreated datePublished" datetime="2020-03-25T10:28:37+08:00">2020-03-25</time>
             </span>
 
           
@@ -244,8 +244,8 @@
       </span>
       <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="disqus" href="/2020/03/24/mono-repo-vs-multi-repo/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/24/mono-repo-vs-multi-repo/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2020/03/25/c-setlocale/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/25/c-setlocale/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -260,79 +260,57 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <blockquote>
-<p>这段时间在研究bilibili泄露出来的源码，发现bilibili虽然使用了微服务的设计理念但是所有服务都是放在同一个仓库底下的，而我司和bilibili恰恰相反，我司所有项目都是分开独立的，也出现了一些问题。于是就产生了好奇并在网上进行了探索随后产生了这篇文章。</p>
+          <h1 id="这些都是个啥？"><a href="#这些都是个啥？" class="headerlink" title="这些都是个啥？"></a>这些都是个啥？</h1><p>上面提到的种种，实际上都是 <code>区域</code> 设置相关的东西，因此今天我们所提到的东西都和<code>区域</code>有关。</p>
+<h1 id="首先-setlocale-是啥？"><a href="#首先-setlocale-是啥？" class="headerlink" title="首先 setlocale(...) 是啥？"></a>首先 <code>setlocale(...)</code> 是啥？</h1><p><code>setLocale(...)</code> 是C库中的一个设置地域化信息的C函数。</p>
+<p>函数原型为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">char *setlocale(int category, const char *locale)</span><br></pre></td></tr></table></figure>
+<p><strong>参数解释：</strong></p>
+<p> <code>category</code>  – 这是一个已命名的常量，指定了受区域设置影响的函数类别，可以设置为以下值。</p>
+<blockquote>
+<p>LC_ALL                         // 包括下面的所有选项。<br>LC_COLLATE                 // 字符串比较。参见 strcoll()。<br>LC_CTYPE                     // 字符分类和转换。例如 strtoupper()。<br>LC_MONETARY             // 货币格式，针对 localeconv()。<br>LC_NUMERIC             // 小数点分隔符，针对 localeconv()。<br>LC_TIME                         // 日期和时间格式，针对 strftime()。<br>LC_MESSAGES             // 系统响应。</p>
 </blockquote>
-<p><strong>本文会尝试回答下面几个问题：</strong></p>
+<p><code>locale</code> – 如果 <code>locale</code>是 <code>NULL</code> 或空字符串 <code>&quot;&quot;</code>，则区域名称将根据环境变量值来设置，其名称与上述的类别名称相同。</p>
+<p>一般程序遇到编码方面的问题，百度都会告诉你设置<code>setlocale(LC_ALL,&quot;&quot;)</code>来解决，下面我们就了解一下这句代码做了什么.</p>
+<h1 id="LC-ALL，LE-又是个啥？"><a href="#LC-ALL，LE-又是个啥？" class="headerlink" title="LC_ALL，LE_* 又是个啥？"></a><code>LC_ALL，LE_*</code> 又是个啥？</h1><p>实际上 <code>LC_ALL，LE_*</code> 是 <code>区域</code> 相关的环境变量。简而言之，<code>LC_COLLATE，LC_TYPE</code>等等都是环境变量。<br>很多程序的运行行为在全球不同的地域、语言环境中是不一样的，例如Linux 中的 <code>date</code>命令的行为就受<code>LC_TIME</code>的影响：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ LC_TIME&#x3D;en_US.UTF-8 date</span><br><span class="line">Fri Oct 31 19:51:16 CST 2014</span><br><span class="line">$ LC_TIME&#x3D;fi_FI.UTF-8 date</span><br><span class="line">pe 31.10.2014 19.52.00 +0800</span><br><span class="line">$ LC_TIME&#x3D;zh_CN.UTF-8 date</span><br><span class="line">2014年 10月 31日 星期五 19:53:07 CST</span><br></pre></td></tr></table></figure>
+<p>因此自然需要一些环境变量来告诉计算机用户所处的地区、语言等等，而<code>locale</code>是用来设置、查询、管理这些变量的linux命令。</p>
+<h1 id="那么-LE-都包含啥？"><a href="#那么-LE-都包含啥？" class="headerlink" title="那么 LE_* 都包含啥？"></a>那么 <code>LE_*</code> 都包含啥？</h1><p>首先来看一些都有哪些需要设置的变量，通过在 linux 系统命令行中输入<code>locale</code> 就可以打印所有相关的环境变量以及对应的值。</p>
+<p>一般会包括：</p>
 <ol>
-<li>什么是单体仓库(<code>mono-repo</code>)？</li>
-<li>为什么 <code>Google</code>/<code>Facebook</code>/<code>Bilibili</code> 采用单体仓库？</li>
-<li>单体仓库(<code>mono-repo</code>)和多仓库(<code>multi-repo</code>)分别解决了哪些问题？</li>
-<li>单体仓库(<code>mono-repo</code>)和多仓库(<code>multi-repo</code>)在解决问题的同时又引入了哪些问题？</li>
+<li><code>LC_CTYPE</code> – 语言符号及其分类</li>
+<li><code>LC_NUMERIC</code> – 数字</li>
+<li><code>LC_COLLATE</code> – 比较和排序习惯</li>
+<li><code>LC_TIME</code> – 时间显示格式</li>
+<li><code>LC_MONETARY</code> – 货币单位</li>
+<li><code>LC_MESSAGES</code> – 信息主要是提示信息,错误信息,状态信息,标题,标签,按钮和菜单等</li>
+<li><code>LC_NAME</code> – 姓名书写方式</li>
+<li><code>LC_ADDRESS</code> – 地址书写方式</li>
+<li><code>LC_TELEPHONE</code> – 电话号码书写方式</li>
+<li><code>LC_MEASUREMENT</code> – 度量衡表达方式 </li>
+<li><code>LC_PAPER</code> – 默认纸张尺寸大小</li>
+<li><code>LC_IDENTIFICATION</code> – 对locale自身包含信息的概述</li>
 </ol>
-<h1 id="为什么要区分单体仓库和多仓库？"><a href="#为什么要区分单体仓库和多仓库？" class="headerlink" title="为什么要区分单体仓库和多仓库？"></a>为什么要区分单体仓库和多仓库？</h1><p>在介绍单体仓库和多仓库前，我们先了解一下应用的类型，了解一下为什么要区分单体仓库和多仓库。</p>
-<h2 id="1-单体应用"><a href="#1-单体应用" class="headerlink" title="1. 单体应用"></a>1. 单体应用</h2><p>在早期，实际上是不用区分单体仓库和多仓库的，因为在早期的时候一个应用就把所有功能打包了。哪怕使用多个仓库也是根据公共模块方式来区分，仓库数量也是比较少的。这时候的应用我们一般叫他单体应用。主要的特点就是一个程序就打包所有功能，全家桶。</p>
-<p>这样的开发模式有很多优点，如：</p>
+<p><strong><em>一般认为由于区域和语言导致的不同习惯大致就是这12类。但是你从 linux 系统命令中输入 <code>locale</code> 获取到的结果可能不止这12个，还有<code>LANG</code>，<code>LANGUAGE</code>和<code>LC_ALL</code>，那是这三个比较特殊。</em></strong></p>
 <ol>
-<li>易于理解项目整体。开发人员可以把整个项目加载到本地的 <code>IDE</code> 当中，进行 <code>code review</code>，方便开发人员把握整体的技术架构和业务目标。</li>
-<li>易于集成和部署。所有的代码在一个仓库里面，不需要特别的集中管理和协调，也可以直接在本地部署调试。</li>
-<li>易于重用。所有的代码都在一个仓库中，开发人员开发的时候比较容易发现和重用已有的代码，而不是去重复造轮子。</li>
-<li>开发人员（通过 `IDE 的支持）容易对现有代码进行重构，可以抽取出一些公共的功能进一步提升代码的质量和复用度。</li>
-<li>易于规范代码。所有的代码在一个仓库当中就可以标准化依赖管理，集中开展 <code>code review</code>，规范化代码的风格。</li>
+<li><code>LANG</code> – 是一个缺省值，所有没有显式设置值的<code>LC_*</code>变量都会取<code>LANG</code>的值。</li>
+<li><code>LANGUAGE</code> – 的优先级比较高，会覆盖所有设置过的<code>LC_*</code>的值</li>
+<li><code>LC_ALL</code> – 并不是一个环境变量，而是一个<code>glibc</code>中定义的一个宏，实际上则是调用了<code>setlocale</code>把所有的<code>LC_*</code>的变量设置了一遍</li>
 </ol>
-<p>但是随着单一应用功能的拓展，应用仓库无限制变大也带来了很多缺点，如：</p>
+<h1 id="如何修改？"><a href="#如何修改？" class="headerlink" title="如何修改？"></a>如何修改？</h1><p>在程序中通过调用 <code>setlocale(...)</code> 来进行修改。</p>
+<p>linux 中可以通过下面几种方式来修改:</p>
 <ol>
-<li>开发效率大幅降低，所有的开发人员在一个项目改代码，递交代码相互等待，代码冲突不断。</li>
-<li>代码维护性变差，随着功能以及代码量的大幅增加，所有代码功能耦合在一起，新人不知道何从下手。</li>
-<li>构建时间过长，任何小修改必须重新构建整个项目，这个过程往往很长。</li>
-<li>稳定性太差，任意一个功能出现问题，可以导致整个应用挂掉。</li>
-<li>扩展性达不到要求，所有功能都在一起，无法简单的横向扩展，容易受限于物理机器的配置。</li>
+<li>创建或编辑<code>/etc/locale.conf</code>对系统级进行设置</li>
+<li>创建或编辑<code>~/.config/locale.conf</code>对当前用户进行设置</li>
+<li>在终端执行<code>export LC_TIME=xxxx</code>对当前终端进行设置</li>
+<li>通过<code>localectl</code>命令来修改，比如<code>localectl set-locale LANG=en_US.utf8</code></li>
 </ol>
-<h2 id="2-微服务应用"><a href="#2-微服务应用" class="headerlink" title="2. 微服务应用"></a>2. 微服务应用</h2><p>既然单一应用的问题是由于后期功能过多，应用复杂度上升产生的。那是否可以通过将单体应用拆解成无数的小应用来避免这些问题呢?</p>
-<p>实际上后来大佬提出的微服务这个概念就类似于上面的思路，通过将一个大型应用拆分成无数个服务。每个服务有自己的代码文件，单独部署，然后共同组成一个应用程序。</p>
-<p><strong>需要注意的是这里的<code>&quot;微&quot;</code>不是指的代码行数，而是说服务的功能限定到单个功能。</strong></p>
-<p>微服务相比单体应用最大的好处是可以独立的开发测试部署和扩展。</p>
-<p>既然单体应用一般采用单体仓库，那么微服务的代码仓库又是如何组织的呢？实际上关于这点网络上讨论的不是很多，而我们公司选择的就是一个服务一个仓库。</p>
-<p>实际上在写这篇文章之前，我也一直以为这样是微服务的最佳实践。但是<code>bilibili</code>的源代码告诉了我们另一个选择，<strong>单体仓库（<code>mono-repo</code>）</strong>。</p>
-<h1 id="单体仓库和多仓库"><a href="#单体仓库和多仓库" class="headerlink" title="单体仓库和多仓库"></a>单体仓库和多仓库</h1><p>实际上，针对微服务代码的仓库组织，业界一直有两种主要的实践：</p>
+<p>使用locale -a可以列出本机目前可以使用的值。locale -av还可以具体查看这些值更详细的信息。<br>  <br><strong>变量生效的优先顺序从高到低如下：</strong></p>
 <ol>
-<li>一种是多仓库（<code>multi-repo</code>），在微服务中就是每个服务一个源码仓库。</li>
-<li>另一种叫单体仓库（<code>mono-repo</code>），虽然应用采用的微服务架构，但将所有源码放在同一个仓库。</li>
+<li><code>LANGUAGE</code> 优先级最高，指定个人对语言环境值的主次偏好，例如 <code>zh_CN:en_US:en</code>，冒号分隔的是多种选择。</li>
+<li><code>LC_ALL</code> 设置的值</li>
+<li><code>LC_*</code> 可设定<code>locale</code>各方面的值，可以覆盖<code>LANG</code>的值。</li>
+<li><code>LANG</code> 指定默认使用的locale值</li>
 </ol>
-<p><strong>从左到右依次为: 单体应用单体仓库（<code>monolith</code>），微服务多仓库（<code>mono-repo</code>），微服务单体仓库（<code>mono-repo</code>）。</strong><br><img src="/2020/03/24/mono-repo-vs-multi-repo/1.jpg" alt="仓库类型"></p>
-<p>首先需要肯定的是，单体仓库和多仓库两种方案能同时存在，一定是各有利弊的，希望大家不要将自己锁定到一种方案上，软件开发中没有银弹，选择最合适的就是最好的。</p>
-<h2 id="1-多仓库"><a href="#1-多仓库" class="headerlink" title="1. 多仓库"></a>1. 多仓库</h2><p><strong>多仓库为我们带来了如下好处：</strong></p>
-<ol>
-<li>每一个服务都有一个独立的仓库，职责单一。</li>
-<li>代码量和复杂性受控，服务由不同的团队独立维护、边界清晰。</li>
-<li>单个服务也易于自治开发测试部署和扩展，不需要集中管理集中协调。</li>
-<li>利于进行权限控制，可以针对单个仓库来分配权限，权限分配粒度比较细。</li>
-</ol>
-<p><strong>但同时，多仓库也存在着以下的问题：</strong></p>
-<ol>
-<li>项目代码不容易规范。每个团队容易各自为政，随意引入依赖，code review 无法集中开展，代码风格各不相同。</li>
-<li>项目集成和部署会比较麻烦。虽然每个项目服务易于集成和部署，但是整个应用集成和部署的时候由于仓库分散就需要集中的管理和协调。</li>
-<li>开发人员缺乏对整个项目的整体认知。开发人员一般只关心自己的服务代码，看不到项目整体，造成缺乏对项目整体架构和业务目标整体性的理解。</li>
-<li>项目间冗余代码多。每个服务一个服务一个仓库，势必造成团队在开发的时候走捷径，不断地重复造轮子而不是去优先重用其他团队开发的代码。</li>
-</ol>
-<h2 id="2-单体仓库"><a href="#2-单体仓库" class="headerlink" title="2. 单体仓库"></a>2. 单体仓库</h2><p><strong>单体仓库的优势：</strong></p>
-<ol>
-<li>易于规范代码。所有的代码在一个仓库当中就可以标准化依赖管理，集中开展 code review，规范化代码的风格。</li>
-<li>易于集成和部署。所有的代码在一个仓库里面，配合自动化构建工具，可以做到一键构建、一键部署，一般不需要特别的集中管理和协调。</li>
-<li>易于理解项目整体。开发人员可以把整个项目加载到本地的 IDE 当中，进行 code review，也可以直接在本地部署调试，方便开发人员把握整体的技术架构和业务目标。</li>
-<li>易于重用。所有的代码都在一个仓库中，开发人员开发的时候比较容易发现和重用已有的代码，而不是去重复造轮子，开发人员（通过 IDE 的支持）容易对现有代码进行重构，可以抽取出一些公共的功能进一步提升代码的质量和复用度。</li>
-</ol>
-<p><strong>单体仓库的劣势：</strong></p>
-<ol>
-<li>单体仓库基本放弃了对读权限的限制，开发人员可以接触到项目所有代码，<code>Bilibili</code>的源代码泄露也印证了这个问题。</li>
-<li>对于写权限，单体仓库也是有着自己的解决方案，比如<code>OWNERS</code>，<code>CODEOWNERS</code>等，但相比多仓库还是差了一些。</li>
-<li>单个服务的开发测试部署和扩展，需要集中管理集中协调，降低了微服务单个服务的自治程度。</li>
-<li>代码量和复杂性不受控，随着公司业务团队规模的变大，单一的代码库会变得越来越庞大复杂性也呈极度的上升，容易受团队能力及开发流程等影响导致结果不可控。</li>
-<li>想要玩转单体仓库，一般需要独立的代码管理和集成团队进行支持，加上配套的自动化构建工具来支持。某些方面已经出现了开源的方案，比如 <code>Google</code> 自研的面向单体仓库的构建工具 <code>Bazel</code>：<span class="exturl" data-url="aHR0cHM6Ly9iYXplbC5idWlsZC8=" title="https://bazel.build/">https://bazel.build/<i class="fa fa-external-link"></i></span> 和 <code>Facebook</code> 的 <code>Buck</code>：<span class="exturl" data-url="aHR0cHM6Ly9idWNrLmJ1aWxkLw==" title="https://buck.build/">https://buck.build/<i class="fa fa-external-link"></i></span> 。但还是需要团队进行整合。</li>
-</ol>
-<p>世界上采用单体仓库管理源码的公司实际并不少，比如： <code>Google</code>，<code>Facebook</code>，<code>Twitter</code> 这些互联网巨头。可以看到，虽然这些公司系统庞大、服务众多，内部研发团队人数众多，但是采用单体仓库也很好的解决了业务需求。</p>
-<h1 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h1><p>微服务架构并不是主张所有的东西都要独立自治，至少代码仓库就可以集中管理，不要让先入为主的观念影响你的判断，根据实际需要选择最合适的方案。</p>
-<p>初创公司的话，在公司早期并且服务不是特别多的情况下，采用单体仓库比较合适。这样也容易养成团队统一的代码风格，过早的分而治之容易导致团队各自为战，代码风格散乱等问题。</p>
 
       
     </div>
@@ -352,7 +330,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.coocn.cn/2020/03/24/hello-world/">
+    <link itemprop="mainEntityOfPage" href="http://blog.coocn.cn/2020/03/25/docker-ssserver/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/apple-touch-icon-next.png">
@@ -366,7 +344,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2020/03/24/hello-world/" class="post-title-link" itemprop="url">Hello World</a>
+            <a href="/2020/03/25/docker-ssserver/" class="post-title-link" itemprop="url">使用 docker 通过 ssh tunnel + shadowoscks 绕过我墙实现科学上网</a>
         </h2>
 
         <div class="post-meta">
@@ -375,8 +353,9 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2020-03-24 16:33:39" itemprop="dateCreated datePublished" datetime="2020-03-24T16:33:39+08:00">2020-03-24</time>
+              <time title="创建时间：2020-03-25 10:24:52 / 修改时间：10:27:05" itemprop="dateCreated datePublished" datetime="2020-03-25T10:24:52+08:00">2020-03-25</time>
             </span>
 
           
@@ -388,8 +367,8 @@
       </span>
       <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="disqus" href="/2020/03/24/hello-world/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/24/hello-world/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2020/03/25/docker-ssserver/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/25/docker-ssserver/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -404,19 +383,1541 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
+          <h1 id="缘由"><a href="#缘由" class="headerlink" title="缘由"></a>缘由</h1><p>可能由于科学上网次数过多，发现公司网络被重点照顾了，v2ray和ssserver 都无法正常科学上网，所以想到了如下这个骚办法。</p>
+<blockquote>
+<p>通过 SSH 隧道加上 ssserver 来达到绕过我墙对 ssserver 的封锁；为啥用 ssserver 呢，因为 ssserver 简单，好启动。</p>
+</blockquote>
+<h1 id="启动服务器"><a href="#启动服务器" class="headerlink" title="启动服务器"></a>启动服务器</h1><p>此处只监听<code>127.0.0.1</code>避免被防火墙嗅探到外网端口。由于是使用ssh tunnel 访问，所以端口不对外也没有任何问题。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p &quot;127.0.0.1:8388:8388&quot;-e &quot;METHOD&#x3D;xchacha20-ietf-poly1305&quot; -e &quot;PASSWORD&#x3D;&lt;password&gt;&quot; -e &quot;SERVER_ADDR&#x3D;0.0.0.0&quot; -e &quot;SERVER_PORT&#x3D;8388&quot; shadowsocks&#x2F;shadowsocks-libev</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+<h1 id="启动客户端"><a href="#启动客户端" class="headerlink" title="启动客户端"></a>启动客户端</h1><h2 id="1-启动端口转发"><a href="#1-启动端口转发" class="headerlink" title="1. 启动端口转发"></a>1. 启动端口转发</h2><p>启动时指定名称为 <code>ss-tunnel</code>，因为 ss 客户端 需要连接这个容器。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run  -d --name ss-tunnel -v &#x2F;ssh&#x2F;:&#x2F;root&#x2F;.ssh ssoor&#x2F;ssh-tunnel ssh -CNTL 0.0.0.0:8388:127.0.0.1:8388 root@&lt;SERVER_IP&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="2-启动-SS-客户端"><a href="#2-启动-SS-客户端" class="headerlink" title="2. 启动 SS 客户端"></a>2. 启动 SS 客户端</h2><p>监听本地 1080 端口对外提供服务，<code>--link ss-tunnel</code> 表示要使用名称访问 <code>ss-tunnel</code> 容器 (<code>ss-local -s ss-tunnel -p 8388</code>)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --link ss-tunnel -p 1080:1080 shadowsocks&#x2F;shadowsocks-libev ss-local -s ss-tunnel -p 8388 -b 0.0.0.0 -l 1080 -m xchacha20-ietf-poly1305 -k &lt;password&gt;</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+<h1 id="愉快的玩耍"><a href="#愉快的玩耍" class="headerlink" title="愉快的玩耍"></a>愉快的玩耍</h1><p>现在可以设置 <code>SOCKS5</code> 代理 愉快的玩耍了。<br>比如使用GIT拉源码:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HTTPS_PROXY&#x3D;socks5:&#x2F;&#x2F;127.0.0.1:1080 git clone https:&#x2F;&#x2F;github.com&#x2F;golang&#x2F;go</span><br></pre></td></tr></table></figure>
+      
+    </div>
 
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
 
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.coocn.cn/2020/03/25/git-clone-depth/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/apple-touch-icon-next.png">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/25/git-clone-depth/" class="post-title-link" itemprop="url">在 git clone 时添加了 --depth 后，如何重新拉取所有全部的历史来获取完整的仓库</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-25 10:21:09 / 修改时间：10:21:16" itemprop="dateCreated datePublished" datetime="2020-03-25T10:21:09+08:00">2020-03-25</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/25/git-clone-depth/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/25/git-clone-depth/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h1><p>由于众所周知的原因，国内在拉 <code>https://github.com/xxx/xxx.git</code> 的时候速度特别慢，所以呢吗，有时我们为了加快 clone 的速度会使用 –depth 参数，比如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;xxx&#x2F;xxx.git --depth 1</span><br></pre></td></tr></table></figure>
+<p>但是这么拉下来之后呢，会有一个问题，就是执行 <code>git log</code> 的时候会显示只有一条提交记录。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">root@d8acdd68f269:&#x2F;source_code&#x2F;mesos# git log</span><br><span class="line">commit 54227a33b68d83b97ef1a7c14283351d45322317 (grafted, HEAD -&gt; master, origin&#x2F;master, origin&#x2F;HEAD)</span><br><span class="line">Author: Andrei Sekretenko &lt;asekretenko@apache.org&gt;</span><br><span class="line">Date:   Fri Feb 28 22:39:54 2020 +0100</span><br><span class="line"></span><br><span class="line">    Got rid of passing Shared&lt;&gt; into &#96;Subscribers::Subscriber::send(...)&#96;.</span><br><span class="line"></span><br><span class="line">    Now that operator API events are authorized synchronously,</span><br><span class="line">    &#96;Subscribers::Subscriber::send(...)&#96; is no longer deferred,</span><br><span class="line">    and copying arguments of &#96;Subscribers::send()&#96; into &#96;Shared&#96;</span><br><span class="line">    becomes unnecessary.</span><br><span class="line"></span><br><span class="line">    Review: https:&#x2F;&#x2F;reviews.apache.org&#x2F;r&#x2F;72179</span><br></pre></td></tr></table></figure>
+
+<p>那么我们要如何把之前的历史重新再 pull 下来呢？</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>实际上<code>git fetch</code> 专门有个参数，用来将浅克隆转换为完整克隆。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">root@d8acdd68f269:&#x2F;source_code&#x2F;mesos# git fetch --help</span><br><span class="line">...</span><br><span class="line">--unshallow</span><br><span class="line">           Convert a shallow repository to a complete one, removing all the limitations imposed by shallow repositories.</span><br></pre></td></tr></table></figure>
+
+<p>所以，只要执行 <code>git fetch --unshallow</code> 就可以了，接下来就等待命令执行完成，完成后就恢复到完整克隆了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@d8acdd68f269:&#x2F;source_code&#x2F;mesos# git fetch --unshallow</span><br><span class="line">remote: Enumerating objects: 152405, done.</span><br><span class="line">remote: Counting objects: 100% (152405&#x2F;152405), done.</span><br><span class="line">remote: Compressing objects: 100% (34825&#x2F;34825), done.</span><br><span class="line">Receiving objects:   3% (4524&#x2F;150778), 1.26 MiB | 762.00 KiB&#x2F;s</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.coocn.cn/2020/03/25/linux-buffer-cache/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/apple-touch-icon-next.png">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/25/linux-buffer-cache/" class="post-title-link" itemprop="url">为什么 Linux buffer/cache 内存占用很高？具体原因以及解决办法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-25 10:17:39 / 修改时间：10:20:22" itemprop="dateCreated datePublished" datetime="2020-03-25T10:17:39+08:00">2020-03-25</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/25/linux-buffer-cache/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/25/linux-buffer-cache/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="表现现象"><a href="#表现现象" class="headerlink" title="表现现象"></a>表现现象</h1><p>在Linux系统中，我们经常用<code>free</code>命令来查看系统内存的使用状态。在一个 <code>CoreOS</code> 的系统上，<code>free</code>命令的显示内容大概是这样一个状态：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">core@localhost ~ $ free</span><br><span class="line">              total        used        free      shared  buff&#x2F;cache   available</span><br><span class="line">Mem:        8145320      391200     333888      204616      7420232     311660</span><br><span class="line">Swap:             0           0           0</span><br></pre></td></tr></table></figure>
+<p>这里的默认显示单位是kb，我们可以通过添加<code>-h</code>参数，来让<code>free</code> 命令显示的更为友好一些。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">core@localhost ~ $ free -h</span><br><span class="line">              total        used        free      shared  buff&#x2F;cache   available</span><br><span class="line">Mem:          7.8Gi       381Mi       0.3Gi       199Mi       7.4Gi       0.3Gi</span><br><span class="line">Swap:            0B          0B          0B</span><br></pre></td></tr></table></figure>
+<p>新版linux相对来说已经好很多了，在老版的时候，是没有<code>available</code>字段的。</p>
+<p>所以放当时来说，大家可能会有下面几种反应：</p>
+<ol>
+<li>对于不太了解linux系统的人来说，看到 <code>free</code> 之后，会觉得内存用了好多，我都没跑什么程序，内存就用完了！Linux好占内存！</li>
+<li>稍微了解linux，并在百度搜索过相关知识的人也许会说，嗯，看起来<code>free</code>是没有多少了，但是真实内存才用了 400Mi 不到，还有很多剩余内存可用。buff/cache 占用比较多，说明系统中有进程曾经读写过文件，但是不要紧，这部分内存在系统内存吃紧的时候会释放出来的。</li>
+</ol>
+<p>但是，上面两种说法都有些片面了，都不是很正确。接下来让我们重新来认识一下<code>buff</code>和<code>cache</code>。</p>
+<h1 id="什么是-buff-cache？"><a href="#什么是-buff-cache？" class="headerlink" title="什么是 buff/cache？"></a>什么是 buff/cache？</h1><p>在<code>Linux 2.4</code>的内存管理中，<code>buffer</code>指Linux内存的：<code>Buffer cache</code>。<code>cache</code>指Linux内存中的：<code>Page cache</code>。一般呢，是这么解释两者的。</p>
+<ul>
+<li>A buffer is someting that has yet to be ‘written’ to disk.</li>
+<li>A cache is someting that has been ‘read’ from the disk and stored for later use.</li>
+</ul>
+<p>翻译过来就是说：</p>
+<ol>
+<li>buffer(buff) 是用来缓存尚未“写入”磁盘的内容。</li>
+<li>cache 是用来缓存从磁盘“读取”出来的东西。</li>
+</ol>
+<p>所以 <code>buffer</code> 被用来当成对io设备写的缓存。而 <code>cache</code> 被用来当作对io设备的读缓存。这里的io设备，主要指的是块设备文件和文件系统上的普通文件。</p>
+<p><strong>但是在 <code>Linux 2.6</code> 以后，它们的意义不一样了。</strong></p>
+<p>在<code>Linux 2.6</code>之后Linux将他们统一合并到了<code>Page cache</code>作为文件层的缓存。而<code>buffer</code>则被用作<code>block</code>层的缓存。<br><code>block</code>层的缓存是什么意思呢，你可以认为一个<code>buffer</code>是一个<code>physical disk block</code>在内存的代表，用来将内存中的<code>pages</code>映射为<code>disk blocks</code>，这部分被使用的内存被叫做<code>buffer</code>。</p>
+<blockquote>
+<p><code>buffer</code>里面的<code>pages</code>，指的是<code>Page cache</code>中的<code>pages</code>，所以，<code>buffer</code>也可以被认为<code>Page cache</code>的一部分。</p>
+</blockquote>
+<p><strong>或者简单来说，<code>buffer</code>负责裸设备相关的缓存，<code>cache</code>负责文件系统的缓存。</strong></p>
+<h2 id="Buffer-的具体职责"><a href="#Buffer-的具体职责" class="headerlink" title="Buffer 的具体职责"></a>Buffer 的具体职责</h2><p>在当前的系统实现里，<code>buffer</code>主要是设计用来在系统对块设备进行读写时作为缓存来使用。这意味着对块的操作会使用<code>buffer</code>进行缓存，比如我们在格式化文件系统的时候。</p>
+<p>但是一般情况下两个缓存系统是一起配合使用的，比如当我们对一个文件进行写操作的时候，<code>cache</code>的内容会被改变，而<code>buffer</code>则用来将<code>cache</code>的<code>page</code>标记为不同的缓冲区，并记录是哪一个缓冲区被修改了。</p>
+<p>这样，内核在后续执行脏数据的回写（<code>writeback</code>）时，就不用将整个<code>page</code>写回，而只需要写回修改的部分即可。</p>
+<h2 id="Cache-的具体职责"><a href="#Cache-的具体职责" class="headerlink" title="Cache 的具体职责"></a>Cache 的具体职责</h2><p><code>cache</code>主要用来作为文件系统上的文件数据的缓存来用，当进程对文件有<code>read/write</code>操作的时候。包括将文件映射到内存的系统调用<code>mmap</code>，就会用到<code>cache</code>。</p>
+<p>因为<code>cache</code>被作为文件类型的缓存来用，所以事实上也负责了大部分的块设备文件的缓存工作。</p>
+<h1 id="怎么回收-buff-cache？"><a href="#怎么回收-buff-cache？" class="headerlink" title="怎么回收 buff/cache？"></a>怎么回收 buff/cache？</h1><p>Linux内核会在内存将要耗尽的时候，自动触发内存回收的工作，以便释放出内存给急需内存的进程使用。</p>
+<p><strong><em>但是这种回收的工作也并不是没有成本。</em></strong></p>
+<p>理解<code>cache</code>是干什么的就知道，<code>cache</code>中存在着一部分<code>write</code>操作的数据。所以必须保证<code>cache</code>中的数据跟对应文件中的数据一致，才能对<code>cache</code>进行释放。</p>
+<p>于是伴随着<code>cache</code>清除的行为的，一般都是系统<code>IO</code>飙高。这是因为内核要将<code>cache</code>中缓存的<code>write</code>数据进行回写。</p>
+<p>我们可以使用下面这个文件来人工触发缓存清除的操作，Linux 提供了三种清空方式：</p>
+<ol>
+<li><code>echo 1 &gt; /proc/sys/vm/drop_caches</code> # 仅清除页面缓存</li>
+<li><code>echo 2 &gt; /proc/sys/vm/drop_caches</code> # 清除目录项和inode</li>
+<li><code>echo 3 &gt; /proc/sys/vm/drop_caches</code> # 清除页面缓存、目录项以及inode</li>
+</ol>
+<p><strong><em>但是这种放时只能在执行的当时起作用，过一段时间之后又会发现内存被占满，怎么办呢？</em></strong></p>
+<p>实际上内核提供了<code>vm.vfs_cache_pressure</code>参数用来控制缓冲区的回收频率，我们可以调整它。</p>
+<p>这个参数是用来控制内核回收VFS缓存的频率。修改这个值会提高或者降低回收VFS缓存的频率。值可以设置为<code>0-200</code>中的任意值。越大回收频率越快，可以把<code>vm.vfs_cache_pressure</code>赋值为<code>200</code>来获得最快的回收频率。这个值默认值一般为<code>100</code>。</p>
+<p>另外也可以使用<code>slabtop</code>分析内存使用情况。一般情况下，<code>dentry</code>和<code>*_inode_cache</code>值越高回收的效果越好。</p>
+<p>为什么是<code>dentry</code>和<code>*_inode_cache</code>呢，这是因为当读写文件时内核会为该文件对象建立一个<code>dentry</code>，并将其缓存起来，方便下一次读写时直接从内存中取出提高效率。至于<code>*_inode_cache</code>我就不是很清楚了，只知道是为了加快对索引节点的索引，如果有清楚的可以告诉我一下。</p>
+<h1 id="测试一下"><a href="#测试一下" class="headerlink" title="测试一下"></a>测试一下</h1><ol>
+<li>首先，我们先看一下目前的内存使用量<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">core@localhost ~ $ free -h</span><br><span class="line">              total        used        free      shared  buff&#x2F;cache   available</span><br><span class="line">Mem:          7.8Gi       383Mi       7.1Gi       199Mi       291Mi       7.0Gi</span><br><span class="line">Swap:            0B          0B          0B</span><br></pre></td></tr></table></figure></li>
+<li>生成一个文件测试一下<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">core@localhost ~ $ dd if&#x3D;&#x2F;dev&#x2F;zero of&#x3D;testfile bs&#x3D;1M count&#x3D;1000</span><br><span class="line">1000+0 records in</span><br><span class="line">1000+0 records out</span><br><span class="line">1048576000 bytes (1.0 GB, 1000 MiB) copied, 1.39192 s, 753 MB&#x2F;s</span><br></pre></td></tr></table></figure></li>
+<li>检查一下内存的使用情况，是否和上面介绍的一样<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">core@localhost ~ $ free -h</span><br><span class="line">              total        used        free      shared  buff&#x2F;cache   available</span><br><span class="line">Mem:          7.8Gi       383Mi       6.1Gi       199Mi       1.3Gi       7.0Gi</span><br><span class="line">Swap:            0B          0B          0B</span><br></pre></td></tr></table></figure></li>
+<li>手动执行一下释放，看能否将内存释放出来<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">core@localhost ~ $ echo 1 | sudo tee &#x2F;proc&#x2F;sys&#x2F;vm&#x2F;drop_caches</span><br><span class="line">1</span><br></pre></td></tr></table></figure></li>
+<li>检查一下内存是否被释放掉<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">core@localhost ~ $ free -h</span><br><span class="line">              total        used        free      shared  buff&#x2F;cache   available</span><br><span class="line">Mem:          7.8Gi       383Mi       7.1Gi       199Mi       291Mi       7.0Gi</span><br><span class="line">Swap:            0B          0B          0B</span><br></pre></td></tr></table></figure></li>
+<li>继续测试一下读取文件<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">core@localhost ~ $ time -p cat testfile &gt; &#x2F;dev&#x2F;null</span><br><span class="line">real 0.39</span><br><span class="line">user 0.00</span><br><span class="line">sys 0.27</span><br></pre></td></tr></table></figure></li>
+<li>可以看到用时 0.39s，我们看下内存使用<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">core@localhost ~ $ free -h</span><br><span class="line">              total        used        free      shared  buff&#x2F;cache   available</span><br><span class="line">Mem:          7.8Gi       382Mi       6.1Gi       199Mi       1.3Gi       7.0Gi</span><br><span class="line">Swap:            0B          0B          0B</span><br></pre></td></tr></table></figure></li>
+<li>然后我们再次执行一下读取文件<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">core@localhost ~ $ time -p cat testfile &gt; &#x2F;dev&#x2F;null</span><br><span class="line">real 0.17</span><br><span class="line">user 0.00</span><br><span class="line">sys 0.17</span><br></pre></td></tr></table></figure></li>
+<li>可以看到用时缩短到了 0.17s，这里需要说明一下的时由于我这边时固态硬盘，所以差距没这么大，如果是机械硬盘的话差距会进一步扩大。</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.coocn.cn/2020/03/25/k8s-configmap-mount/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/apple-touch-icon-next.png">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/25/k8s-configmap-mount/" class="post-title-link" itemprop="url">kubernetes 如何挂载 configMap 中的单个文件以及挂载时需要注意的相关事项</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-25 10:14:13 / 修改时间：10:16:42" itemprop="dateCreated datePublished" datetime="2020-03-25T10:14:13+08:00">2020-03-25</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/25/k8s-configmap-mount/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/25/k8s-configmap-mount/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="问题现象"><a href="#问题现象" class="headerlink" title="问题现象"></a>问题现象</h1><p>默认挂载 <code>configMap</code> 时，<code>kubernetes</code> 会覆盖掉挂载的整个目录，哪怕使用 <code>items</code> 也会导致整个目录被覆盖，那么如何实现挂在单个文件而不覆盖整个目录呢。下面说一下 <code>kubernetes</code> 中如何挂载单个文件而不是整个目录。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="使用-subPath"><a href="#使用-subPath" class="headerlink" title="使用 subPath"></a>使用 <code>subPath</code></h2><p>实际上 <code>kubernets</code> 本身提供了 <code>volumeMounts.subPath</code> 属性用于挂在单个文件而不是整个目录。</p>
+<p>下面是一个示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: my-lamp-site</span><br><span class="line">spec:</span><br><span class="line">    containers:</span><br><span class="line">    - name: php</span><br><span class="line">      image: php:7.0-apache</span><br><span class="line">      volumeMounts:</span><br><span class="line">      - mountPath: &#x2F;var&#x2F;www&#x2F;html&#x2F;index.php</span><br><span class="line">        name: index</span><br><span class="line">        subPath: index.php</span><br><span class="line">    volumes:</span><br><span class="line">    - name: index</span><br><span class="line">      configMap:</span><br><span class="line">        name: php-index</span><br><span class="line">        items:</span><br><span class="line">        - key: index.php</span><br><span class="line">          path: index.php</span><br></pre></td></tr></table></figure>
+<h1 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h1><p>需要注意的是：</p>
+<ul>
+<li>如果使用ConfigMap的subPath挂载为Container的Volume，<code>Kubernetes不会做自动热更新</code></li>
+<li>ConfigMap 哪怕不使用<code>subPath</code>的挂载方式 <code>C#</code> 文件修改监听功能也没有触发，<code>Golang</code> 的正常，怀疑可能和自己的实现有关，因为还有其他事情没有继续跟进，下周准备继续跟进一下。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.coocn.cn/2020/03/25/gitlab-ci-config-file/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/apple-touch-icon-next.png">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/25/gitlab-ci-config-file/" class="post-title-link" itemprop="url">Gitlab-CI 配置文件 .gitlab-ci.yml 详细说明，基于官方文档翻译</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-25 10:11:06 / 修改时间：10:12:44" itemprop="dateCreated datePublished" datetime="2020-03-25T10:11:06+08:00">2020-03-25</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/25/gitlab-ci-config-file/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/25/gitlab-ci-config-file/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="配置-jobs-文件-gitlab-ci-yml"><a href="#配置-jobs-文件-gitlab-ci-yml" class="headerlink" title="配置 jobs 文件 .gitlab-ci.yml"></a>配置 jobs 文件 .gitlab-ci.yml</h1><h2 id="原文档：https-docs-gitlab-com-ee-ci-yaml-README-html"><a href="#原文档：https-docs-gitlab-com-ee-ci-yaml-README-html" class="headerlink" title="原文档：https://docs.gitlab.com/ee/ci/yaml/README.html"></a>原文档：<span class="exturl" data-url="aHR0cHM6Ly9kb2NzLmdpdGxhYi5jb20vZWUvY2kveWFtbC9SRUFETUUuaHRtbA==" title="https://docs.gitlab.com/ee/ci/yaml/README.html">https://docs.gitlab.com/ee/ci/yaml/README.html<i class="fa fa-external-link"></i></span></h2><ol>
+<li>GitLab-CI 使用 <span class="exturl" data-url="aHR0cHM6Ly9lbi53aWtpcGVkaWEub3JnL3dpa2kvWUFNTA==" title="https://en.wikipedia.org/wiki/YAML">YAML<i class="fa fa-external-link"></i></span> 文件管理配置 job .</li>
+<li>文件存放于仓库的根目录, 命名为 <code>.gitlab-ci.yml</code> , 定义了 job 应该如何工作.</li>
+</ol>
+<h2 id="Job"><a href="#Job" class="headerlink" title="Job"></a>Job</h2><p>YAML 文件定义了一系列带有约束说明的 <code>job</code>, <code>job</code> 至少需要要包含 <code>script</code>：</p>
+<p>示例:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job1:</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">"execute-script-for-job1"</span></span><br><span class="line"></span><br><span class="line"><span class="attr">job2:</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">"execute-script-for-job2"</span></span><br></pre></td></tr></table></figure>
+
+<p>上面这个例子是一个最简单且带有两个 <code>job</code> 的 CI 配置，每个任务分别执行不同的命令。</p>
+<p><code>script</code> 可以直接执行系统命令(如：./configure;make;make install)或者直接执行脚本(test.sh)。</p>
+<p>任务是由 CI 接管并且在服务器执行, 并且每一个任务的执行都是独立的。</p>
+<p><code>job</code> 的名称具有唯一性在文件中只能出现一次, 并且下列词汇被保留不能被使用:</p>
+<ul>
+<li><code>image</code></li>
+<li><code>services</code></li>
+<li><code>stages</code></li>
+<li><code>types</code></li>
+<li><code>before_script</code></li>
+<li><code>after_script</code></li>
+<li><code>variables</code></li>
+<li><code>cache</code></li>
+</ul>
+<p>下面是 <code>job</code> 可以配置的参数列表：</p>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>是否必须</th>
+<th>参数说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>script</td>
+<td>yes</td>
+<td>需要在 <code>docker</code> 容器中运行的脚本</td>
+</tr>
+<tr>
+<td>image</td>
+<td>no</td>
+<td><code>docker</code> 容器使用的镜像, covered in <a href="../docker/using_docker_images.md#define-image-and-services-from-gitlab-ciyml">Using Docker Images</a></td>
+</tr>
+<tr>
+<td>services</td>
+<td>no</td>
+<td>需要关联的 <code>docker</code> 服务, covered in <a href="../docker/using_docker_images.md#define-image-and-services-from-gitlab-ciyml">Using Docker Images</a></td>
+</tr>
+<tr>
+<td>stage</td>
+<td>no</td>
+<td>定义当前 <code>job</code> 运行在那个阶段 (默认: <code>test</code>)</td>
+</tr>
+<tr>
+<td>variables</td>
+<td>no</td>
+<td>Define job variables on a job level</td>
+</tr>
+<tr>
+<td>only</td>
+<td>no</td>
+<td>Defines a list of git refs for which job is created</td>
+</tr>
+<tr>
+<td>except</td>
+<td>no</td>
+<td>Defines a list of git refs for which job is not created</td>
+</tr>
+<tr>
+<td>tags</td>
+<td>no</td>
+<td>通过 <code>tags</code> 确定使用指定还是使用通用部署程序。</td>
+</tr>
+<tr>
+<td>allow_failure</td>
+<td>no</td>
+<td>允许 <code>job</code> 失败. <code>job</code> 失败不会影响最终结果</td>
+</tr>
+<tr>
+<td>when</td>
+<td>no</td>
+<td>定义 <code>job</code> 在什么时候运行. 支持参数 <code>on_success</code>, <code>on_failure</code>, <code>always</code> or <code>manual</code></td>
+</tr>
+<tr>
+<td>dependencies</td>
+<td>no</td>
+<td>Define other jobs that a job depends on so that you can pass artifacts between them</td>
+</tr>
+<tr>
+<td>artifacts</td>
+<td>no</td>
+<td>Define list of <a href="#artifacts">job artifacts</a></td>
+</tr>
+<tr>
+<td>cache</td>
+<td>no</td>
+<td>Define list of files that should be cached between subsequent runs</td>
+</tr>
+<tr>
+<td>before_script</td>
+<td>no</td>
+<td>覆盖 <code>job</code> 执行前需要执行的脚本设置</td>
+</tr>
+<tr>
+<td>after_script</td>
+<td>no</td>
+<td>覆盖 <code>job</code> 执行后需要执行的脚本设置</td>
+</tr>
+<tr>
+<td>environment</td>
+<td>no</td>
+<td>Defines a name of environment to which deployment is done by this job</td>
+</tr>
+<tr>
+<td>coverage</td>
+<td>no</td>
+<td>Define code coverage settings for a given job</td>
+</tr>
+<tr>
+<td>retry</td>
+<td>no</td>
+<td><code>job</code> 执行发生故障时自动重试次数</td>
+</tr>
+</tbody></table>
+<p>更复杂的例子：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">image:</span> <span class="string">ruby:2.1</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">postgres</span></span><br><span class="line"></span><br><span class="line"><span class="attr">before_script:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">bundle</span> <span class="string">install</span></span><br><span class="line"></span><br><span class="line"><span class="attr">after_script:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">rm</span> <span class="string">secrets</span></span><br><span class="line"></span><br><span class="line"><span class="attr">stages:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">build</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">test</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">deploy</span></span><br><span class="line"></span><br><span class="line"><span class="attr">job1:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">build</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">execute-script-for-job1</span></span><br><span class="line">  <span class="attr">only:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">master</span></span><br><span class="line">  <span class="attr">tags:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">docker</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="image-and-services"><a href="#image-and-services" class="headerlink" title="image and services"></a><code>image</code> and <code>services</code></h2><p>这两个关键字允许使用一个自定义的Docker镜像和一系列的服务，并且可以用于整个job周期. </p>
+<p><a href="../docker/README.md">详细配置文档</a></p>
+<h2 id="before-script"><a href="#before-script" class="headerlink" title="before_script"></a><code>before_script</code></h2><ul>
+<li>必须是数组或多行字符串</li>
+<li><code>before_script</code> 支持定义为 <code>global</code> 和 <code>job</code> 类型， <code>job</code> 类型会覆盖掉 <code>global</code> 类型的值</li>
+</ul>
+<p><code>before_script</code> 定义在所有 <code>job</code>（包括<code>deploy job</code>）之前运行的命令。（在 <a href="#artifacts">artifacts</a> 运行之后）.</p>
+<h2 id="after-script"><a href="#after-script" class="headerlink" title="after_script"></a><code>after_script</code></h2><ul>
+<li>必须是数组或多行字符串</li>
+<li><code>after_script</code> 支持定义为 <code>global</code> 和 <code>job</code> 类型， <code>job</code> 类型会覆盖掉 <code>global</code> 类型的值</li>
+</ul>
+<p><code>after_script</code> 定义在所有 <code>job</code>（包括失败的 <code>job</code>）之后运行的命令。</p>
+<p>The <code>before_script</code> and the main <code>script</code> are concatenated and run in a single context/container.<br>The <code>after_script</code> is run separately, so depending on the executor, changes done<br>outside of the working tree might not be visible, e.g. software installed in the<br><code>before_script</code>.</p>
+<p>示例:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">before_script:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">global</span> <span class="string">before</span> <span class="string">script</span></span><br><span class="line"></span><br><span class="line"><span class="attr">job:</span></span><br><span class="line">  <span class="attr">before_script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">execute</span> <span class="string">this</span> <span class="string">instead</span> <span class="string">of</span> <span class="string">global</span> <span class="string">before</span> <span class="string">script</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">my</span> <span class="string">command</span></span><br><span class="line">  <span class="attr">after_script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">execute</span> <span class="string">this</span> <span class="string">after</span> <span class="string">my</span> <span class="string">script</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="stages（阶段）"><a href="#stages（阶段）" class="headerlink" title="stages（阶段）"></a><code>stages</code>（阶段）</h2><ul>
+<li><code>stages</code> 只支持 <code>global</code>  类型</li>
+<li><code>stages</code> 定义了 <code>job</code> 支持的执行阶段和顺序</li>
+<li><code>stages</code> 中的元素顺序决定了对应 <code>job</code> 的执行顺序</li>
+<li>下一个 <code>阶段</code> 的 <code>job</code> 只会在前一个 <code>阶段</code> 的 <code>job</code> 执行成功后开始执行。</li>
+</ul>
+<p>示例: </p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">stages:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">build</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">test</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">deploy</span></span><br></pre></td></tr></table></figure>
+<p>运行顺序：</p>
+<ol>
+<li>运行所有的 <code>build</code> 。</li>
+<li>如果所有作业都 <code>build</code> 运行成功，那么开始运行所有的 <code>test</code>。</li>
+<li>如果所有作业都 <code>test</code> 运行成功，那么开始运行所有的 <code>deploy</code>。</li>
+<li>如果所有作业都 <code>deploy</code> 成功，则标记 <code>job</code> 为 <code>passed</code> 。</li>
+<li>如果在之前动作中有任何失败，则标记 <code>job</code> 为 <code>failed</code> 并终止 <code>job</code> 执行。</li>
+</ol>
+<p><strong>没有定义时的默认动作</strong>:</p>
+<ol>
+<li>如果 <code>.gitlab-ci.yml</code> 文件中没有定义 <code>stages</code> , <code>stages</code> 将会被设置成 <code>build</code> -&gt; <code>test</code> -&gt; <code>deploy</code>.</li>
+<li>如果 <code>job</code> 没有定义 <code>stage</code>, 则 <code>job</code> 的 <code>stage</code> 将会被设置成 <code>test</code></li>
+</ol>
+<h2 id="stage"><a href="#stage" class="headerlink" title="stage"></a><code>stage</code></h2><ul>
+<li>相同 <code>stage</code> 的 <code>job</code> 会并行执行</li>
+</ul>
+<p><code>stage</code> is defined per-job and relies on <a href="#stages"><code>stages</code></a> which is defined<br>globally. It allows to group jobs into different stages, and jobs of the same<br><code>stage</code> are executed in <code>parallel</code>. For example:</p>
+<p><code>stage</code> 的值必须定义在 <a href="#stages"><code>stages</code></a> 中，可以通过设置 <code>stage</code> 来对 <code>job</code> 进行分组，相同分组的 <code>job</code> 将会并行执行.</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">stages:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">build</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">test</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">deploy</span></span><br><span class="line"></span><br><span class="line"><span class="attr">job 1:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">build</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">make</span> <span class="string">build</span> <span class="string">dependencies</span></span><br><span class="line"></span><br><span class="line"><span class="attr">job 2:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">build</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">make</span> <span class="string">build</span> <span class="string">artifacts</span></span><br><span class="line"></span><br><span class="line"><span class="attr">job 3:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">test</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">make</span> <span class="string">test</span></span><br><span class="line"></span><br><span class="line"><span class="attr">job 4:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">deploy</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">make</span> <span class="string">deploy</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="script"><a href="#script" class="headerlink" title="script"></a><code>script</code></h2><p><code>script</code> 是 <code>job</code> 运行需要的唯一一个必须字段, 通过 <code>script</code> 来指定应该如何执行 <code>job</code>. </p>
+<p><code>script</code> 可以设置为 <code>string</code> 和 <code>array</code> 类型：</p>
+<p>通过将 <code>script</code> 设置为 <code>string</code> 来设置 <code>job</code> 执行什么命令：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job:</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">"bundle exec rspec"</span></span><br></pre></td></tr></table></figure>
+
+<p>也可以通过将 <code>script</code> 设置为 <code>array</code> 来指定运行多个命令:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job:</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">uname</span> <span class="string">-a</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">bundle</span> <span class="string">exec</span> <span class="string">rspec</span></span><br></pre></td></tr></table></figure>
+
+<p>如果命令中包含有特殊字符, 则需要用双引号将 <code>script</code> 括起来.</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job:</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">make</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"ps -aux | grep gcc"</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>这些字符是 YAML 中的特殊字符:</strong></p>
+<p><code>:</code>, <code>{</code>, <code>}</code>, <code>[</code>, <code>]</code>, <code>,</code>, <code>&amp;</code>, <code>*</code>, <code>#</code>, <code>?</code>, <code>|</code>, <code>-</code>, <code>&lt;</code>, <code>&gt;</code>, <code>=</code>, <code>!</code>, <code>%</code>, <code>@</code>, <code>`</code>.</p>
+<h2 id="only-and-except-simplified"><a href="#only-and-except-simplified" class="headerlink" title="only and except (simplified)"></a><code>only</code> and <code>except</code> (simplified)</h2><p><code>only</code> and <code>except</code> are two parameters that set a job policy to limit when<br>jobs are created:</p>
+<ol>
+<li>只有满足 <code>only</code> 条件的 branches 和 tags 才会被运行.</li>
+<li>和 <code>only</code> 相反, 满足 <code>except</code> 条件的 branches 和 tags 将 <strong><em>不会</em></strong> 被运行.</li>
+</ol>
+<p>下面是refs策略的使用规则:</p>
+<ul>
+<li><code>only</code> 和 <code>except</code> 支持使用正则表达式.</li>
+<li><code>only</code> 和 <code>except</code> 支持使用特殊的关键字.</li>
+<li><code>only</code> 和 <code>except</code> 支持同时设置, 当同时设置时 <code>only</code> 和 <code>except</code> 将会同时起作用.</li>
+<li><code>only</code> 和 <code>except</code> 也可以用来指定 forks 作业的存储库路径。</li>
+</ul>
+<p>下面是 <code>only</code> 和 <code>except</code> 支持的关键字:</p>
+<table>
+<thead>
+<tr>
+<th><strong>值</strong></th>
+<th><strong>说明</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>branches</code></td>
+<td>当分支被 push.</td>
+</tr>
+<tr>
+<td><code>tags</code></td>
+<td>当一个 tags 被 push.</td>
+</tr>
+<tr>
+<td><code>api</code></td>
+<td>When pipeline has been triggered by a second pipelines API (not triggers API).</td>
+</tr>
+<tr>
+<td><code>external</code></td>
+<td>使用 CI 之外的其他 CI 服务时</td>
+</tr>
+<tr>
+<td><code>pipelines</code></td>
+<td>For multi-project triggers, created using the API with <code>CI_JOB_TOKEN</code>.</td>
+</tr>
+<tr>
+<td><code>pushes</code></td>
+<td>Pipeline is triggered by a <code>git push</code> by the user.</td>
+</tr>
+<tr>
+<td><code>schedules</code></td>
+<td>For <a href="../../user/project/pipelines/schedules.md">scheduled pipelines</a>.</td>
+</tr>
+<tr>
+<td><code>triggers</code></td>
+<td>For pipelines created using a trigger token.</td>
+</tr>
+<tr>
+<td><code>web</code></td>
+<td>For pipelines created using <strong>Run pipeline</strong> button in GitLab UI (under your project’s <strong>Pipelines</strong>).</td>
+</tr>
+</tbody></table>
+<p>下面这个例子中, <code>job</code> 会跳过所有分支, 只在以 <code>issue-</code> 开头的 <code>ref</code> 时运行:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job:</span></span><br><span class="line">  <span class="comment"># use regexp</span></span><br><span class="line">  <span class="attr">only:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">/^issue-.*$/</span></span><br><span class="line">  <span class="comment"># use special keyword</span></span><br><span class="line">  <span class="attr">except:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">branches</span></span><br></pre></td></tr></table></figure>
+
+<p>下面这个例子中, <code>job</code> 只会执行有 <code>tags</code> 或者通过<a href="../../user/project/pipelines/schedules.md">API触发器</a>构建的 <code>refs</code> :</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job:</span></span><br><span class="line">  <span class="comment"># use special keywords</span></span><br><span class="line">  <span class="attr">only:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">tags</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">triggers</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">schedules</span></span><br></pre></td></tr></table></figure>
+
+<p>下面这个例子中, <code>job</code> 只会在除 <code>gitlab-org/gitlab-ce</code> <code>master</code> 分支外的其他分支时才会运行。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job:</span></span><br><span class="line">  <span class="attr">only:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">branches@gitlab-org/gitlab-ce</span></span><br><span class="line">  <span class="attr">except:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">master@gitlab-org/gitlab-ce</span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="only-and-except-complex"><a href="#only-and-except-complex" class="headerlink" title="only and except (complex)"></a><code>only</code> and <code>except</code> (complex)</h2><blockquote>
+<p><code>refs</code> and <code>kubernetes</code> policies introduced in GitLab 10.0</p>
+</blockquote>
+<blockquote>
+<p><code>variables</code> policy introduced in 10.7</p>
+</blockquote>
+<p>CAUTION: <strong>Warning:</strong><br>This an <em>alpha</em> feature, and it it subject to change at any time without<br>prior notice!</p>
+<p>Since GitLab 10.0 it is possible to define a more elaborate only/except job<br>policy configuration.</p>
+<p>GitLab now supports both, simple and complex strategies, so it is possible to<br>use an array and a hash configuration scheme.</p>
+<p>Three keys are now available: <code>refs</code>, <code>kubernetes</code> and <code>variables</code>.<br>Refs strategy equals to simplified only/except configuration, whereas<br>kubernetes strategy accepts only <code>active</code> keyword.</p>
+<p><code>variables</code> keyword is used to define variables expressions. In other words<br>you can use predefined variables / project / group or<br>environment-scoped variables to define an expression GitLab is going to<br>evaluate in order to decide whether a job should be created or not.</p>
+<p>See the example below. Job is going to be created only when pipeline has been<br>scheduled or runs for a <code>master</code> branch, and only if kubernetes service is<br>active in the project.</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job:</span></span><br><span class="line">  <span class="attr">only:</span></span><br><span class="line">    <span class="attr">refs:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">master</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">schedules</span></span><br><span class="line">    <span class="attr">kubernetes:</span> <span class="string">active</span></span><br></pre></td></tr></table></figure>
+
+<p>使用变量表达式的示例:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">cap</span> <span class="string">staging</span> <span class="string">deploy</span></span><br><span class="line">  <span class="attr">only:</span></span><br><span class="line">    <span class="attr">refs:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">branches</span></span><br><span class="line">    <span class="attr">variables:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">$RELEASE</span> <span class="string">==</span> <span class="string">"staging"</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">$STAGING</span></span><br></pre></td></tr></table></figure>
+
+<p>根据提交的消息来排除作业:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">end-to-end:</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">rake</span> <span class="string">test:end-to-end</span></span><br><span class="line">  <span class="attr">except:</span></span><br><span class="line">    <span class="attr">variables:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">$CI_COMMIT_MESSAGE</span> <span class="string">=~</span> <span class="string">/skip-end-to-end-tests/</span></span><br></pre></td></tr></table></figure>
+
+<p>Learn more about variables expressions on <a href="../variables/README.md#variables-expressions">a separate page</a>.</p>
+<h2 id="runner（环境）"><a href="#runner（环境）" class="headerlink" title="runner（环境）"></a>runner（环境）</h2><p><code>job</code> 需要在 <code>runner</code> 中运行， <code>runner</code> 的新增删除需要管理员来操作， <code>runner</code> 包含了一些全局设置和 <code>tags</code>,只有满足 <code>tags</code> 的 <code>job</code> 才会在 <code>runner</code> 中运行。</p>
+<p><code>runner</code> 有多种类型:</p>
+<ol>
+<li>通用, 通用 <code>runner</code> 可以运行所有 <code>job</code></li>
+<li>特定, 特定 <code>runner</code> 包含有一系列 <code>tags</code></li>
+</ol>
+<p>特定 <code>runner</code> 只会运行 <code>runner</code> <code>tags</code> 包含所有 <code>job</code> <code>tags</code> 的  <code>job</code>。</p>
+<h2 id="tags"><a href="#tags" class="headerlink" title="tags"></a><code>tags</code></h2><p><code>tags</code> 用来确定使用哪个 <code>runner</code> 运行当前任务，如果不设置的话将使用通用 <code>runner</code> 运行.</p>
+<p>示例:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job:</span></span><br><span class="line">  <span class="attr">tags:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">ruby</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">postgres</span></span><br></pre></td></tr></table></figure>
+
+<p>只有同时定义了 <code>ruby</code> 和 <code>postgres</code> 的 <code>runner</code> 才能运行这个 <code>job</code>.</p>
+<h2 id="allow-failure"><a href="#allow-failure" class="headerlink" title="allow_failure"></a><code>allow_failure</code></h2><p>允许 <code>job</code> 失败. <code>job</code> 失败不会影响最终结果</p>
+<p>设置 <code>allow_failure</code> 的 <code>job</code> 失败后不会中断 CI 的执行，当你希望一个 <code>job</code> 执行失败之后 CI 仍要继续执行时可以设置这个值为 <code>true</code> 。</p>
+<p>如果你设置了 <code>allow_failure</code> 并且 <code>job</code> 执行失败, 这时候 CI 会显示执行成功但是会出现一个警告信息。警告信息用来提示有一个允许失败的任务执行失败。（管理人员可能会执行其他措施。）</p>
+<p>下面这个例子中, 当 <code>job1</code> 运行失败, 也不会打断 CI 执行，CI 会继续运行下一阶段，因为它设置了 <code>allow_failure: true</code>：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job1:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">test</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">execute_script_that_will_fail</span></span><br><span class="line">  <span class="attr">allow_failure:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">job2:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">test</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">execute_script_that_will_succeed</span></span><br><span class="line"></span><br><span class="line"><span class="attr">job3:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">deploy</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">deploy_to_staging</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="when"><a href="#when" class="headerlink" title="when"></a><code>when</code></h2><p><code>when</code> 用来指示 <code>job</code> 应该在什么时候开始运行.</p>
+<p><code>when</code> 可以被设置为以下值:</p>
+<ol>
+<li><code>on_success</code> - 只有之前的阶段全部成功时才会执行.(默认值)</li>
+<li><code>on_failure</code> - 当之前的阶段执行过程中出现过任何错误时执行.</li>
+<li><code>always</code>     - 无论之前的阶段是否执行成功都执行.</li>
+<li><code>manual</code>     - 手动执行, <a href="#when-manual">阅读更多</a>.</li>
+</ol>
+<p>示例:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">stages:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">build</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">cleanup_build</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">test</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">deploy</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">cleanup</span></span><br><span class="line"></span><br><span class="line"><span class="attr">build_job:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">build</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">make</span> <span class="string">build</span></span><br><span class="line"></span><br><span class="line"><span class="attr">cleanup_build_job:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">cleanup_build</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">cleanup</span> <span class="string">build</span> <span class="string">when</span> <span class="string">failed</span></span><br><span class="line">  <span class="attr">when:</span> <span class="string">on_failure</span></span><br><span class="line"></span><br><span class="line"><span class="attr">test_job:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">test</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">make</span> <span class="string">test</span></span><br><span class="line"></span><br><span class="line"><span class="attr">deploy_job:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">deploy</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">make</span> <span class="string">deploy</span></span><br><span class="line">  <span class="attr">when:</span> <span class="string">manual</span></span><br><span class="line"></span><br><span class="line"><span class="attr">cleanup_job:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">cleanup</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">cleanup</span> <span class="string">after</span> <span class="string">jobs</span></span><br><span class="line">  <span class="attr">when:</span> <span class="string">always</span></span><br></pre></td></tr></table></figure>
+
+<p>示例的执行方式:</p>
+<ol>
+<li><code>cleanup_build_job</code> 只有在 <code>build_job</code> 失败时才会执行.</li>
+<li>不论其他 <code>job</code> 是否执行成功, <code>cleanup_job</code> 总会在最后一个被执行.</li>
+<li>可以通过 Gitlab 控制台手动执行 <code>deploy_job</code>.</li>
+</ol>
+<h3 id="when-manual"><a href="#when-manual" class="headerlink" title="when:manual"></a><code>when:manual</code></h3><blockquote>
+<p><strong>Notes:</strong></p>
+</blockquote>
+<ul>
+<li>Introduced in GitLab 8.10.</li>
+<li>Blocking manual actions were introduced in GitLab 9.0.</li>
+<li>Protected actions were introduced in GitLab 9.2.</li>
+</ul>
+<p>Manual actions are a special type of job that are not executed automatically,<br>they need to be explicitly started by a user. An example usage of manual actions<br>would be a deployment to a production environment. Manual actions can be started<br>from the pipeline, job, environment, and deployment views. Read more at the<br><a href="../environments.md#manually-deploying-to-environments">environments documentation</a>.</p>
+<p>Manual actions can be either optional or blocking. Blocking manual actions will<br>block the execution of the pipeline at the stage this action is defined in. It’s<br>possible to resume execution of the pipeline when someone executes a blocking<br>manual action by clicking a <em>play</em> button.</p>
+<p>When a pipeline is blocked, it will not be merged if Merge When Pipeline Succeeds<br>is set. Blocked pipelines also do have a special status, called <em>manual</em>.<br>Manual actions are non-blocking by default. If you want to make manual action<br>blocking, it is necessary to add <code>allow_failure: false</code> to the job’s definition<br>in <code>.gitlab-ci.yml</code>.</p>
+<p>Optional manual actions have <code>allow_failure: true</code> set by default and their<br>Statuses do not contribute to the overall pipeline status. So, if a manual<br>action fails, the pipeline will eventually succeed.</p>
+<p>Manual actions are considered to be write actions, so permissions for<br><a href="../../user/project/protected_branches.md">protected branches</a> are used when<br>user wants to trigger an action. In other words, in order to trigger a manual<br>action assigned to a branch that the pipeline is running for, user needs to<br>have ability to merge to this branch.</p>
+<h2 id="environment"><a href="#environment" class="headerlink" title="environment"></a><code>environment</code></h2><blockquote>
+</blockquote>
+<p><strong>Notes:</strong></p>
+<ul>
+<li>Introduced in GitLab 8.9.</li>
+<li>You can read more about environments and find more examples in the<br><a href="../environments.md">documentation about environments</a>.</li>
+</ul>
+<p><code>environment</code> is used to define that a job deploys to a specific environment.<br>If <code>environment</code> is specified and no environment under that name exists, a new<br>one will be created automatically.</p>
+<p>In its simplest form, the <code>environment</code> keyword can be defined like:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy to production:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">deploy</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">git</span> <span class="string">push</span> <span class="string">production</span> <span class="string">HEAD:master</span></span><br><span class="line">  <span class="attr">environment:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">production</span></span><br></pre></td></tr></table></figure>
+
+<p>In the above example, the <code>deploy to production</code> job will be marked as doing a<br>deployment to the <code>production</code> environment.</p>
+<h3 id="environment-name"><a href="#environment-name" class="headerlink" title="environment:name"></a><code>environment:name</code></h3><blockquote>
+</blockquote>
+<p><strong>Notes:</strong></p>
+<ul>
+<li>Introduced in GitLab 8.11.</li>
+<li>Before GitLab 8.11, the name of an environment could be defined as a string like<br><code>environment: production</code>. The recommended way now is to define it under the<br><code>name</code> keyword.</li>
+<li>The <code>name</code> parameter can use any of the defined CI variables,<br>including predefined, secure variables and <code>.gitlab-ci.yml</code> <a href="#variables"><code>variables</code></a>.<br>You however cannot use variables defined under <code>script</code>.</li>
+</ul>
+<p><code>environment</code> 可以设置为:</p>
+<ul>
+<li>letters</li>
+<li>digits</li>
+<li>spaces</li>
+<li><code>-</code></li>
+<li><code>_</code></li>
+<li><code>/</code></li>
+<li><code>$</code></li>
+<li><code>{</code></li>
+<li><code>}</code></li>
+</ul>
+<p>Common names are <code>qa</code>, <code>staging</code>, and <code>production</code>, but you can use whatever<br>name works with your workflow.</p>
+<p>Instead of defining the name of the environment right after the <code>environment</code><br>keyword, it is also possible to define it as a separate value. For that, use<br>the <code>name</code> keyword under <code>environment</code>:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy to production:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">deploy</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">git</span> <span class="string">push</span> <span class="string">production</span> <span class="string">HEAD:master</span></span><br><span class="line">  <span class="attr">environment:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">production</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="environment-url"><a href="#environment-url" class="headerlink" title="environment:url"></a><code>environment:url</code></h3><blockquote>
+</blockquote>
+<p><strong>Notes:</strong></p>
+<ul>
+<li>Introduced in GitLab 8.11.</li>
+<li>Before GitLab 8.11, the URL could be added only in GitLab’s UI. The<br>recommended way now is to define it in <code>.gitlab-ci.yml</code>.</li>
+<li>The <code>url</code> parameter can use any of the defined CI variables,<br>including predefined, secure variables and <code>.gitlab-ci.yml</code> <a href="#variables"><code>variables</code></a>.<br>You however cannot use variables defined under <code>script</code>.</li>
+</ul>
+<p>This is an optional value that when set, it exposes buttons in various places<br>in GitLab which when clicked take you to the defined URL.</p>
+<p>In the example below, if the job finishes successfully, it will create buttons<br>in the merge requests and in the environments/deployments pages which will point<br>to <code>https://prod.example.com</code>.</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy to production:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">deploy</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">git</span> <span class="string">push</span> <span class="string">production</span> <span class="string">HEAD:master</span></span><br><span class="line">  <span class="attr">environment:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">production</span></span><br><span class="line">    <span class="attr">url:</span> <span class="string">https://prod.example.com</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="environment-on-stop"><a href="#environment-on-stop" class="headerlink" title="environment:on_stop"></a><code>environment:on_stop</code></h3><blockquote>
+</blockquote>
+<p><strong>Notes:</strong></p>
+<ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly9naXRsYWIuY29tL2dpdGxhYi1vcmcvZ2l0bGFiLWNlL21lcmdlX3JlcXVlc3RzLzY2Njk=" title="https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/6669">Introduced<i class="fa fa-external-link"></i></span> in GitLab 8.13.</li>
+<li>Starting with GitLab 8.14, when you have an environment that has a stop action<br>defined, GitLab will automatically trigger a stop action when the associated<br>branch is deleted.</li>
+</ul>
+<p>Closing (stoping) environments can be achieved with the <code>on_stop</code> keyword defined under<br><code>environment</code>. It declares a different job that runs in order to close<br>the environment.</p>
+<p>Read the <code>environment:action</code> section for an example.</p>
+<h3 id="environment-action"><a href="#environment-action" class="headerlink" title="environment:action"></a><code>environment:action</code></h3><blockquote>
+<p><span class="exturl" data-url="aHR0cHM6Ly9naXRsYWIuY29tL2dpdGxhYi1vcmcvZ2l0bGFiLWNlL21lcmdlX3JlcXVlc3RzLzY2Njk=" title="https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/6669">Introduced<i class="fa fa-external-link"></i></span> in GitLab 8.13.</p>
+</blockquote>
+<p>The <code>action</code> keyword is to be used in conjunction with <code>on_stop</code> and is defined<br>in the job that is called to close the environment.</p>
+<p>Take for instance:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">review_app:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">deploy</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">make</span> <span class="string">deploy-app</span></span><br><span class="line">  <span class="attr">environment:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">review</span></span><br><span class="line">    <span class="attr">on_stop:</span> <span class="string">stop_review_app</span></span><br><span class="line"></span><br><span class="line"><span class="attr">stop_review_app:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">deploy</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">make</span> <span class="string">delete-app</span></span><br><span class="line">  <span class="attr">when:</span> <span class="string">manual</span></span><br><span class="line">  <span class="attr">environment:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">review</span></span><br><span class="line">    <span class="attr">action:</span> <span class="string">stop</span></span><br></pre></td></tr></table></figure>
+
+<p>In the above example we set up the <code>review_app</code> job to deploy to the <code>review</code><br>environment, and we also defined a new <code>stop_review_app</code> job under <code>on_stop</code>.<br>Once the <code>review_app</code> job is successfully finished, it will trigger the<br><code>stop_review_app</code> job based on what is defined under <code>when</code>. In this case we<br>set it up to <code>manual</code> so it will need a <a href="#manual-actions">manual action</a> via<br>GitLab’s web interface in order to run.</p>
+<p>The <code>stop_review_app</code> job is <strong>required</strong> to have the following keywords defined:</p>
+<ul>
+<li><code>when</code> - <a href="#when">reference</a></li>
+<li><code>environment:name</code></li>
+<li><code>environment:action</code></li>
+<li><code>stage</code> should be the same as the <code>review_app</code> in order for the environment<br>to stop automatically when the branch is deleted</li>
+</ul>
+<h3 id="Dynamic-environments"><a href="#Dynamic-environments" class="headerlink" title="Dynamic environments"></a>Dynamic environments</h3><blockquote>
+</blockquote>
+<p><strong>Notes:</strong></p>
+<ul>
+<li><span class="exturl" data-url="aHR0cHM6Ly9naXRsYWIuY29tL2dpdGxhYi1vcmcvZ2l0bGFiLWNlL21lcmdlX3JlcXVlc3RzLzYzMjM=" title="https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/6323">Introduced<i class="fa fa-external-link"></i></span> in GitLab 8.12 and GitLab Runner 1.6.</li>
+<li>The <code>$CI_ENVIRONMENT_SLUG</code> was <span class="exturl" data-url="aHR0cHM6Ly9naXRsYWIuY29tL2dpdGxhYi1vcmcvZ2l0bGFiLWNlL21lcmdlX3JlcXVlc3RzLzc5ODM=" title="https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/7983">introduced<i class="fa fa-external-link"></i></span> in GitLab 8.15.</li>
+<li>The <code>name</code> and <code>url</code> parameters can use any of the defined CI variables,<br>including predefined, secure variables and <code>.gitlab-ci.yml</code> <a href="#variables"><code>variables</code></a>.<br>You however cannot use variables defined under <code>script</code>.</li>
+</ul>
+<p>For example:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy as review app:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">deploy</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">make</span> <span class="string">deploy</span></span><br><span class="line">  <span class="attr">environment:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">review/$CI_COMMIT_REF_NAME</span></span><br><span class="line">    <span class="attr">url:</span> <span class="string">https://$CI_ENVIRONMENT_SLUG.example.com/</span></span><br></pre></td></tr></table></figure>
+
+<p>The <code>deploy as review app</code> job will be marked as deployment to dynamically<br>create the <code>review/$CI_COMMIT_REF_NAME</code> environment, where <code>$CI_COMMIT_REF_NAME</code><br>is an <a href="../variables/README.md">environment variable</a> set by the Runner. The<br><code>$CI_ENVIRONMENT_SLUG</code> variable is based on the environment name, but suitable<br>for inclusion in URLs. In this case, if the <code>deploy as review app</code> job was run<br>in a branch named <code>pow</code>, this environment would be accessible with an URL like<br><code>https://review-pow.example.com/</code>.</p>
+<p>This of course implies that the underlying server which hosts the application<br>is properly configured.</p>
+<p>The common use case is to create dynamic environments for branches and use them<br>as Review Apps. You can see a simple example using Review Apps at<br><span class="exturl" data-url="aHR0cHM6Ly9naXRsYWIuY29tL2dpdGxhYi1leGFtcGxlcy9yZXZpZXctYXBwcy1uZ2lueC8=" title="https://gitlab.com/gitlab-examples/review-apps-nginx/">https://gitlab.com/gitlab-examples/review-apps-nginx/<i class="fa fa-external-link"></i></span>.</p>
+<h2 id="cache"><a href="#cache" class="headerlink" title="cache"></a><code>cache</code></h2><blockquote>
+</blockquote>
+<p><strong>Notes:</strong></p>
+<ul>
+<li>Introduced in GitLab Runner v0.7.0.</li>
+<li><code>cache</code> 可以被设置成全局的和 <code>job</code> 的.</li>
+<li>From GitLab 9.0, caching is enabled and shared between pipelines and jobs<br>by default.</li>
+<li>From GitLab 9.2, caches are restored before <a href="#artifacts">artifacts</a>.</li>
+</ul>
+<p>TIP: <strong>Learn more:</strong><br>Read how caching works and find out some good practices in the<br><a href="../caching/index.md">caching dependencies documentation</a>.</p>
+<p><code>cache</code> is used to specify a list of files and directories which should be<br>cached between jobs. You can only use paths that are within the project<br>workspace.</p>
+<p>If <code>cache</code> is defined outside the scope of jobs, it means it is set<br>globally and all jobs will use that definition.</p>
+<h3 id="cache-paths"><a href="#cache-paths" class="headerlink" title="cache:paths"></a><code>cache:paths</code></h3><p>Use the <code>paths</code> directive to choose which files or directories will be cached.<br>Wildcards can be used as well.</p>
+<p>Cache all files in <code>binaries</code> that end in <code>.apk</code> and the <code>.config</code> file:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">rspec:</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">test</span></span><br><span class="line">  <span class="attr">cache:</span></span><br><span class="line">    <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">binaries/*.apk</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">.config</span></span><br></pre></td></tr></table></figure>
+
+<p>Locally defined cache overrides globally defined options. The following <code>rspec</code><br>job will cache only <code>binaries/</code>:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">cache:</span></span><br><span class="line">  <span class="attr">paths:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">my/files</span></span><br><span class="line"></span><br><span class="line"><span class="attr">rspec:</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">test</span></span><br><span class="line">  <span class="attr">cache:</span></span><br><span class="line">    <span class="attr">key:</span> <span class="string">rspec</span></span><br><span class="line">    <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">binaries/</span></span><br></pre></td></tr></table></figure>
+
+<p>Note that since cache is shared between jobs, if you’re using different<br>paths for different jobs, you should also set a different <strong>cache:key</strong><br>otherwise cache content can be overwritten.</p>
+<h3 id="cache-key"><a href="#cache-key" class="headerlink" title="cache:key"></a><code>cache:key</code></h3><blockquote>
+<p>Introduced in GitLab Runner v1.0.0.</p>
+</blockquote>
+<p>Since the cache is shared between jobs, if you’re using different<br>paths for different jobs, you should also set a different <code>cache:key</code><br>otherwise cache content can be overwritten.</p>
+<p>The <code>key</code> directive allows you to define the affinity of caching between jobs,<br>allowing to have a single cache for all jobs, cache per-job, cache per-branch<br>or any other way that fits your workflow. This way, you can fine tune caching,<br>allowing you to cache data between different jobs or even different branches.</p>
+<p>The <code>cache:key</code> variable can use any of the<br><a href="../variables/README.md">predefined variables</a>, and the default key, if not<br>set, is just literal <code>default</code> which means everything is shared between each<br>pipelines and jobs by default, starting from GitLab 9.0.</p>
+<p>NOTE: <strong>Note:</strong><br>The <code>cache:key</code> variable cannot contain the <code>/</code> character, or the equivalent<br>URI-encoded <code>%2F</code>; a value made only of dots (<code>.</code>, <code>%2E</code>) is also forbidden.</p>
+<p>For example, to enable per-branch caching:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">cache:</span></span><br><span class="line">  <span class="attr">key:</span> <span class="string">"$CI_COMMIT_REF_SLUG"</span></span><br><span class="line">  <span class="attr">paths:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">binaries/</span></span><br></pre></td></tr></table></figure>
+
+<p>If you use <strong>Windows Batch</strong> to run your shell scripts you need to replace<br><code>$</code> with <code>%</code>:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">cache:</span></span><br><span class="line">  <span class="attr">key:</span> <span class="string">"%CI_COMMIT_REF_SLUG%"</span></span><br><span class="line">  <span class="attr">paths:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">binaries/</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="cache-untracked"><a href="#cache-untracked" class="headerlink" title="cache:untracked"></a><code>cache:untracked</code></h3><p>Set <code>untracked: true</code> to cache all files that are untracked in your Git<br>repository:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">rspec:</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">test</span></span><br><span class="line">  <span class="attr">cache:</span></span><br><span class="line">    <span class="attr">untracked:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<p>Cache all Git untracked files and files in <code>binaries</code>:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">rspec:</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">test</span></span><br><span class="line">  <span class="attr">cache:</span></span><br><span class="line">    <span class="attr">untracked:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">binaries/</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="cache-policy"><a href="#cache-policy" class="headerlink" title="cache:policy"></a><code>cache:policy</code></h3><blockquote>
+<p>Introduced in GitLab 9.4.</p>
+</blockquote>
+<p>The default behaviour of a caching job is to download the files at the start of<br>execution, and to re-upload them at the end. This allows any changes made by the<br>job to be persisted for future runs, and is known as the <code>pull-push</code> cache<br>policy.</p>
+<p>If you know the job doesn’t alter the cached files, you can skip the upload step<br>by setting <code>policy: pull</code> in the job specification. Typically, this would be<br>twinned with an ordinary cache job at an earlier stage to ensure the cache<br>is updated from time to time:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">stages:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">setup</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">test</span></span><br><span class="line"></span><br><span class="line"><span class="attr">prepare:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">setup</span></span><br><span class="line">  <span class="attr">cache:</span></span><br><span class="line">    <span class="attr">key:</span> <span class="string">gems</span></span><br><span class="line">    <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">vendor/bundle</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">bundle</span> <span class="string">install</span> <span class="string">--deployment</span></span><br><span class="line"></span><br><span class="line"><span class="attr">rspec:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">test</span></span><br><span class="line">  <span class="attr">cache:</span></span><br><span class="line">    <span class="attr">key:</span> <span class="string">gems</span></span><br><span class="line">    <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">vendor/bundle</span></span><br><span class="line">    <span class="attr">policy:</span> <span class="string">pull</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">bundle</span> <span class="string">exec</span> <span class="string">rspec</span> <span class="string">...</span></span><br></pre></td></tr></table></figure>
+
+<p>This helps to speed up job execution and reduce load on the cache server,<br>especially when you have a large number of cache-using jobs executing in<br>parallel.</p>
+<p>Additionally, if you have a job that unconditionally recreates the cache without<br>reference to its previous contents, you can use <code>policy: push</code> in that job to<br>skip the download step.</p>
+<h2 id="artifacts"><a href="#artifacts" class="headerlink" title="artifacts"></a><code>artifacts</code></h2><blockquote>
+</blockquote>
+<p><strong>Notes:</strong></p>
+<ul>
+<li>Introduced in GitLab Runner v0.7.0 for non-Windows platforms.</li>
+<li>Windows support was added in GitLab Runner v.1.0.0.</li>
+<li>From GitLab 9.2, caches are restored before artifacts.</li>
+<li>Not all executors are <span class="exturl" data-url="aHR0cHM6Ly9kb2NzLmdpdGxhYi5jb20vcnVubmVyL2V4ZWN1dG9ycy8jY29tcGF0aWJpbGl0eS1jaGFydA==" title="https://docs.gitlab.com/runner/executors/#compatibility-chart">supported<i class="fa fa-external-link"></i></span>.</li>
+<li>Job artifacts are only collected for successful jobs by default.</li>
+</ul>
+<p><code>artifacts</code> is used to specify a list of files and directories which should be<br>attached to the job after success.</p>
+<p>The artifacts will be sent to GitLab after the job finishes successfully and will<br>be available for download in the GitLab UI.</p>
+<p><a href="../../user/project/pipelines/job_artifacts.md">Read more about artifacts.</a></p>
+<h3 id="artifacts-paths"><a href="#artifacts-paths" class="headerlink" title="artifacts:paths"></a><code>artifacts:paths</code></h3><p>You can only use paths that are within the project workspace. To pass artifacts<br>between different jobs, see <a href="#dependencies">dependencies</a>.</p>
+<p>Send all files in <code>binaries</code> and <code>.config</code>:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">artifacts:</span></span><br><span class="line">  <span class="attr">paths:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">binaries/</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">.config</span></span><br></pre></td></tr></table></figure>
+
+<p>To disable artifact passing, define the job with empty <a href="#dependencies">dependencies</a>:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">build</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">make</span> <span class="string">build</span></span><br><span class="line">  <span class="attr">dependencies:</span> <span class="string">[]</span></span><br></pre></td></tr></table></figure>
+
+<p>You may want to create artifacts only for tagged releases to avoid filling the<br>build server storage with temporary build artifacts.</p>
+<p>Create artifacts only for tags (<code>default-job</code> will not create artifacts):</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">default-job:</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">mvn</span> <span class="string">test</span> <span class="string">-U</span></span><br><span class="line">  <span class="attr">except:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">tags</span></span><br><span class="line"></span><br><span class="line"><span class="attr">release-job:</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">mvn</span> <span class="string">package</span> <span class="string">-U</span></span><br><span class="line">  <span class="attr">artifacts:</span></span><br><span class="line">    <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">target/*.war</span></span><br><span class="line">  <span class="attr">only:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">tags</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="artifacts-name"><a href="#artifacts-name" class="headerlink" title="artifacts:name"></a><code>artifacts:name</code></h3><blockquote>
+<p>Introduced in GitLab 8.6 and GitLab Runner v1.1.0.</p>
+</blockquote>
+<p>The <code>name</code> directive allows you to define the name of the created artifacts<br>archive. That way, you can have a unique name for every archive which could be<br>useful when you’d like to download the archive from GitLab. The <code>artifacts:name</code><br>variable can make use of any of the <a href="../variables/README.md">predefined variables</a>.<br>The default name is <code>artifacts</code>, which becomes <code>artifacts.zip</code> when downloaded.</p>
+<p>NOTE: <strong>Note:</strong><br>If your branch-name contains forward slashes<br>(e.g. <code>feature/my-feature</code>) it is advised to use <code>$CI_COMMIT_REF_SLUG</code><br>instead of <code>$CI_COMMIT_REF_NAME</code> for proper naming of the artifact.</p>
+<p>To create an archive with a name of the current job:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job:</span></span><br><span class="line">  <span class="attr">artifacts:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">"$CI_JOB_NAME"</span></span><br><span class="line">    <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">binaries/</span></span><br></pre></td></tr></table></figure>
+
+<p>To create an archive with a name of the current branch or tag including only<br>the binaries directory:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job:</span></span><br><span class="line">   <span class="attr">artifacts:</span></span><br><span class="line">     <span class="attr">name:</span> <span class="string">"$CI_COMMIT_REF_NAME"</span></span><br><span class="line">    <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">binaries/</span></span><br></pre></td></tr></table></figure>
+
+<p>To create an archive with a name of the current job and the current branch or<br>tag including only the binaries directory:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job:</span></span><br><span class="line">  <span class="attr">artifacts:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">"$CI_JOB_NAME-$CI_COMMIT_REF_NAME"</span></span><br><span class="line">    <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">binaries/</span></span><br></pre></td></tr></table></figure>
+
+<p>To create an archive with a name of the current <a href="#stages">stage</a> and branch name:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job:</span></span><br><span class="line">  <span class="attr">artifacts:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">"$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"</span></span><br><span class="line">    <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">binaries/</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>If you use <strong>Windows Batch</strong> to run your shell scripts you need to replace<br><code>$</code> with <code>%</code>:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job:</span></span><br><span class="line">  <span class="attr">artifacts:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">"%CI_JOB_STAGE%-%CI_COMMIT_REF_NAME%"</span></span><br><span class="line">    <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">binaries/</span></span><br></pre></td></tr></table></figure>
+
+<p>If you use <strong>Windows PowerShell</strong> to run your shell scripts you need to replace<br><code>$</code> with <code>$env:</code>:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job:</span></span><br><span class="line">  <span class="attr">artifacts:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">"$env:CI_JOB_STAGE-$env:CI_COMMIT_REF_NAME"</span></span><br><span class="line">    <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">binaries/</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="artifacts-untracked"><a href="#artifacts-untracked" class="headerlink" title="artifacts:untracked"></a><code>artifacts:untracked</code></h3><p><code>artifacts:untracked</code> is used to add all Git untracked files as artifacts (along<br>to the paths defined in <code>artifacts:paths</code>).</p>
+<p>NOTE: <strong>Note:</strong><br>To exclude the folders/files which should not be a part of <code>untracked</code> just<br>add them to <code>.gitignore</code>.</p>
+<p>Send all Git untracked files:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">artifacts:</span></span><br><span class="line">  <span class="attr">untracked:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<p>Send all Git untracked files and files in <code>binaries</code>:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">artifacts:</span></span><br><span class="line">  <span class="attr">untracked:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">paths:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">binaries/</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="artifacts-when"><a href="#artifacts-when" class="headerlink" title="artifacts:when"></a><code>artifacts:when</code></h3><blockquote>
+<p>Introduced in GitLab 8.9 and GitLab Runner v1.3.0.</p>
+</blockquote>
+<p><code>artifacts:when</code> is used to upload artifacts on job failure or despite the<br>failure.</p>
+<p><code>artifacts:when</code> can be set to one of the following values:</p>
+<ol>
+<li><code>on_success</code> - upload artifacts only when the job succeeds. This is the default.</li>
+<li><code>on_failure</code> - upload artifacts only when the job fails.</li>
+<li><code>always</code> - upload artifacts regardless of the job status.</li>
+</ol>
+<p>To upload artifacts only when job fails:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job:</span></span><br><span class="line">  <span class="attr">artifacts:</span></span><br><span class="line">    <span class="attr">when:</span> <span class="string">on_failure</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="artifacts-expire-in"><a href="#artifacts-expire-in" class="headerlink" title="artifacts:expire_in"></a><code>artifacts:expire_in</code></h3><blockquote>
+<p>Introduced in GitLab 8.9 and GitLab Runner v1.3.0.</p>
+</blockquote>
+<p><code>expire_in</code> allows you to specify how long artifacts should live before they<br>expire and therefore deleted, counting from the time they are uploaded and<br>stored on GitLab. If the expiry time is not defined, it defaults to the<br><a href="../../user/admin_area/settings/continuous_integration.md#default-artifacts-expiration">instance wide setting</a><br>(30 days by default, forever on GitLab.com).</p>
+<p>You can use the <strong>Keep</strong> button on the job page to override expiration and<br>keep artifacts forever.</p>
+<p>After their expiry, artifacts are deleted hourly by default (via a cron job),<br>and are not accessible anymore.</p>
+<p>The value of <code>expire_in</code> is an elapsed time. Examples of parsable values:</p>
+<ul>
+<li>‘3 mins 4 sec’</li>
+<li>‘2 hrs 20 min’</li>
+<li>‘2h20min’</li>
+<li>‘6 mos 1 day’</li>
+<li>‘47 yrs 6 mos and 4d’</li>
+<li>‘3 weeks and 2 days’</li>
+</ul>
+<p>To expire artifacts 1 week after being uploaded:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job:</span></span><br><span class="line">  <span class="attr">artifacts:</span></span><br><span class="line">    <span class="attr">expire_in:</span> <span class="number">1</span> <span class="string">week</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="dependencies"><a href="#dependencies" class="headerlink" title="dependencies"></a><code>dependencies</code></h2><blockquote>
+<p>Introduced in GitLab 8.6 and GitLab Runner v1.1.1.</p>
+</blockquote>
+<p>This feature should be used in conjunction with <a href="#artifacts"><code>artifacts</code></a> and<br>allows you to define the artifacts to pass between different jobs.</p>
+<p>Note that <code>artifacts</code> from all previous <a href="#stages">stages</a> are passed by default.</p>
+<p>To use this feature, define <code>dependencies</code> in context of the job and pass<br>a list of all previous jobs from which the artifacts should be downloaded.<br>You can only define jobs from stages that are executed before the current one.<br>An error will be shown if you define jobs from the current stage or next ones.<br>Defining an empty array will skip downloading any artifacts for that job.<br>The status of the previous job is not considered when using <code>dependencies</code>, so<br>if it failed or it is a manual job that was not run, no error occurs.</p>
+<hr>
+<p>In the following example, we define two jobs with artifacts, <code>build:osx</code> and<br><code>build:linux</code>. When the <code>test:osx</code> is executed, the artifacts from <code>build:osx</code><br>will be downloaded and extracted in the context of the build. The same happens<br>for <code>test:linux</code> and artifacts from <code>build:linux</code>.</p>
+<p>The job <code>deploy</code> will download artifacts from all previous jobs because of<br>the <a href="#stages">stage</a> precedence:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">build:osx:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">build</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">make</span> <span class="string">build:osx</span></span><br><span class="line">  <span class="attr">artifacts:</span></span><br><span class="line">    <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">binaries/</span></span><br><span class="line"></span><br><span class="line"><span class="attr">build:linux:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">build</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">make</span> <span class="string">build:linux</span></span><br><span class="line">  <span class="attr">artifacts:</span></span><br><span class="line">    <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">binaries/</span></span><br><span class="line"></span><br><span class="line"><span class="attr">test:osx:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">test</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">make</span> <span class="string">test:osx</span></span><br><span class="line">  <span class="attr">dependencies:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">build:osx</span></span><br><span class="line"></span><br><span class="line"><span class="attr">test:linux:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">test</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">make</span> <span class="string">test:linux</span></span><br><span class="line">  <span class="attr">dependencies:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">build:linux</span></span><br><span class="line"></span><br><span class="line"><span class="attr">deploy:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">deploy</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">make</span> <span class="string">deploy</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="When-a-dependent-job-will-fail"><a href="#When-a-dependent-job-will-fail" class="headerlink" title="When a dependent job will fail"></a>When a dependent job will fail</h3><blockquote>
+<p>Introduced in GitLab 10.3.</p>
+</blockquote>
+<p>If the artifacts of the job that is set as a dependency have been<br><a href="#artifacts-expire_in">expired</a> or<br><a href="../../user/project/pipelines/job_artifacts.md#erasing-artifacts">erased</a>, then<br>the dependent job will fail.</p>
+<p>NOTE: <strong>Note:</strong><br>You can ask your administrator to<br><a href="../../administration/job_artifacts.md#validation-for-dependencies">flip this switch</a><br>and bring back the old behavior.</p>
+<h2 id="coverage"><a href="#coverage" class="headerlink" title="coverage"></a><code>coverage</code></h2><blockquote>
+<p><span class="exturl" data-url="aHR0cHM6Ly9naXRsYWIuY29tL2dpdGxhYi1vcmcvZ2l0bGFiLWNlL21lcmdlX3JlcXVlc3RzLzc0NDc=" title="https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/7447">Introduced<i class="fa fa-external-link"></i></span> in GitLab 8.17.</p>
+</blockquote>
+<p><code>coverage</code> allows you to configure how code coverage will be extracted from the<br>job output.</p>
+<p>Regular expressions are the only valid kind of value expected here. So, using<br>surrounding <code>/</code> is mandatory in order to consistently and explicitly represent<br>a regular expression string. You must escape special characters if you want to<br>match them literally.</p>
+<p>A simple example:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job1:</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">rspec</span></span><br><span class="line">  <span class="attr">coverage:</span> <span class="string">'/Code coverage: \d+\.\d+/'</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="retry"><a href="#retry" class="headerlink" title="retry"></a><code>retry</code></h2><blockquote>
+<p><span class="exturl" data-url="aHR0cHM6Ly9naXRsYWIuY29tL2dpdGxhYi1vcmcvZ2l0bGFiLWNlL21lcmdlX3JlcXVlc3RzLzEyOTA5" title="https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/12909">Introduced<i class="fa fa-external-link"></i></span> in GitLab 9.5.</p>
+</blockquote>
+<p><code>retry</code> 用来设置 <code>job</code> 执行出错时的重试次数, 需要设置成 <code>int</code> 类型，并且值必须 &gt;= 0 &amp;&amp; &lt;= 2.</p>
+<p>如果配置了 <code>retry</code> 的 <code>job</code> 执行时发生错误, 则 <code>job</code> 将被再次运行，成功将会退出，或者 <code>retry</code> 次全都发生错误。</p>
+<p>示例：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">test:</span></span><br><span class="line">  <span class="attr">script:</span> <span class="string">rspec</span></span><br><span class="line">  <span class="attr">retry:</span> <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="include-STARTER"><a href="#include-STARTER" class="headerlink" title="include [STARTER]"></a><code>include</code> <strong>[STARTER]</strong></h2><blockquote>
+<p>Introduced in <span class="exturl" data-url="aHR0cHM6Ly9hYm91dC5naXRsYWIuY29tL2dpdGxhYi1lZS8=" title="https://about.gitlab.com/gitlab-ee/">GitLab Edition Premium<i class="fa fa-external-link"></i></span> 10.5.<br>Available for Starter, Premium and Ultimate <span class="exturl" data-url="aHR0cHM6Ly9hYm91dC5naXRsYWIuY29tL3Byb2R1Y3RzLw==" title="https://about.gitlab.com/products/">versions<i class="fa fa-external-link"></i></span> since 10.6.<br>Behaviour expanded in GitLab 10.8 to allow more flexible overriding</p>
+</blockquote>
+<p>Using the <code>include</code> keyword, you can allow the inclusion of external YAML files.</p>
+<p>In the following example, the content of <code>.before-script-template.yml</code> will be<br>automatically fetched and evaluated along with the content of <code>.gitlab-ci.yml</code>:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Content of https://gitlab.com/awesome-project/raw/master/.before-script-template.yml</span></span><br><span class="line"></span><br><span class="line"><span class="attr">before_script:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">apt-get</span> <span class="string">update</span> <span class="string">-qq</span> <span class="string">&amp;&amp;</span> <span class="string">apt-get</span> <span class="string">install</span> <span class="string">-y</span> <span class="string">-qq</span> <span class="string">sqlite3</span> <span class="string">libsqlite3-dev</span> <span class="string">nodejs</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">gem</span> <span class="string">install</span> <span class="string">bundler</span> <span class="string">--no-ri</span> <span class="string">--no-rdoc</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">bundle</span> <span class="string">install</span> <span class="string">--jobs</span> <span class="string">$(nproc)</span>  <span class="string">"$&#123;FLAGS[@]&#125;"</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Content of .gitlab-ci.yml</span></span><br><span class="line"></span><br><span class="line"><span class="attr">include:</span> <span class="string">'https://gitlab.com/awesome-project/raw/master/.before-script-template.yml'</span></span><br><span class="line"></span><br><span class="line"><span class="attr">rspec:</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">bundle</span> <span class="string">exec</span> <span class="string">rspec</span></span><br></pre></td></tr></table></figure>
+
+<p>You can define it either as a single string, or, in case you want to include<br>more than one files, an array of different values . The following examples<br>are both valid cases:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Single string</span></span><br><span class="line"></span><br><span class="line"><span class="attr">include:</span> <span class="string">'/templates/.after-script-template.yml'</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Array</span></span><br><span class="line"></span><br><span class="line"><span class="attr">include:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">'https://gitlab.com/awesome-project/raw/master/.before-script-template.yml'</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">'/templates/.after-script-template.yml'</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><code>include</code> supports two types of files:</p>
+<ul>
+<li><p><strong>local</strong> to the same repository, referenced by using full paths in the same<br>repository, with <code>/</code> being the root directory. For example:</p>
+  <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Within the repository</span></span><br><span class="line"><span class="attr">include:</span> <span class="string">'/templates/.gitlab-ci-template.yml'</span></span><br></pre></td></tr></table></figure>
+
+<p>  NOTE: <strong>Note:</strong><br>  You can only use files that are currently tracked by Git on the same branch<br>  your configuration file is. In other words, when using a <strong>local file</strong>, make<br>  sure that both <code>.gitlab-ci.yml</code> and the local file are on the same branch.</p>
+<p>  NOTE: <strong>Note:</strong><br>  We don’t support the inclusion of local files through Git submodules paths.</p>
+</li>
+<li><p><strong>remote</strong> in a different location, accessed using HTTP/HTTPS, referenced<br>using the full URL. For example:</p>
+  <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">include:</span> <span class="string">'https://gitlab.com/awesome-project/raw/master/.gitlab-ci-template.yml'</span></span><br></pre></td></tr></table></figure>
+
+<p>  NOTE: <strong>Note:</strong><br>  The remote file must be publicly accessible through a simple GET request, as we don’t support authentication schemas in the remote URL.</p>
+</li>
+</ul>
+<hr>
+<p>Since GitLab 10.8 we are now recursively merging the files defined in <code>include</code><br>with those in <code>.gitlab-ci.yml</code>. Files defined by <code>include</code> are always<br>evaluated first and recursively merged with the content of <code>.gitlab-ci.yml</code>, no<br>matter the position of the <code>include</code> keyword. You can take advantage of<br>recursive merging to customize and override details in included CI<br>configurations with local definitions.</p>
+<p>The following example shows specific YAML-defined variables and details of the<br><code>production</code> job from an include file being customized in <code>.gitlab-ci.yml</code>.</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Content of https://company.com/autodevops-template.yml</span></span><br><span class="line"></span><br><span class="line"><span class="attr">variables:</span></span><br><span class="line">  <span class="attr">POSTGRES_USER:</span> <span class="string">user</span></span><br><span class="line">  <span class="attr">POSTGRES_PASSWORD:</span> <span class="string">testing_password</span></span><br><span class="line">  <span class="attr">POSTGRES_DB:</span> <span class="string">$CI_ENVIRONMENT_SLUG</span></span><br><span class="line"></span><br><span class="line"><span class="attr">production:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">production</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">install_dependencies</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">deploy</span></span><br><span class="line">  <span class="attr">environment:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">production</span></span><br><span class="line">    <span class="attr">url:</span> <span class="string">https://$CI_PROJECT_PATH_SLUG.$AUTO_DEVOPS_DOMAIN</span></span><br><span class="line">  <span class="attr">only:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">master</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Content of .gitlab-ci.yml</span></span><br><span class="line"></span><br><span class="line"><span class="attr">include:</span> <span class="string">'https://company.com/autodevops-template.yml'</span></span><br><span class="line"></span><br><span class="line"><span class="attr">image:</span> <span class="string">alpine:latest</span></span><br><span class="line"></span><br><span class="line"><span class="attr">variables:</span></span><br><span class="line">  <span class="attr">POSTGRES_USER:</span> <span class="string">root</span></span><br><span class="line">  <span class="attr">POSTGRES_PASSWORD:</span> <span class="string">secure_password</span></span><br><span class="line"></span><br><span class="line"><span class="attr">stages:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">build</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">test</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">production</span></span><br><span class="line"></span><br><span class="line"><span class="attr">production:</span></span><br><span class="line">  <span class="attr">environment:</span></span><br><span class="line">    <span class="attr">url:</span> <span class="string">https://domain.com</span></span><br></pre></td></tr></table></figure>
+
+<p>In this case, the variables <code>POSTGRES_USER</code> and <code>POSTGRES_PASSWORD</code> along<br>with the environment url of the <code>production</code> job defined in<br><code>autodevops-template.yml</code> have been overridden by new values defined in<br><code>.gitlab-ci.yml</code>.</p>
+<p>NOTE: <strong>Note:</strong><br>Recursive includes are not supported meaning your external files<br>should not use the <code>include</code> keyword, as it will be ignored.</p>
+<p>Recursive merging lets you extend and override dictionary mappings, but<br>you cannot add or modify items to an included array. For example, to add<br>an additional item to the production job script, you must repeat the<br>existing script items.</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Content of https://company.com/autodevops-template.yml</span></span><br><span class="line"></span><br><span class="line"><span class="attr">production:</span></span><br><span class="line">  <span class="attr">stage:</span> <span class="string">production</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">install_dependencies</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">deploy</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Content of .gitlab-ci.yml</span></span><br><span class="line"></span><br><span class="line"><span class="attr">include:</span> <span class="string">'https://company.com/autodevops-template.yml'</span></span><br><span class="line"></span><br><span class="line"><span class="attr">stages:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">production</span></span><br><span class="line"></span><br><span class="line"><span class="attr">production:</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">install_depedencies</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">deploy</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">notify_owner</span></span><br></pre></td></tr></table></figure>
+
+<p>In this case, if <code>install_dependencies</code> and <code>deploy</code> were not repeated in<br><code>.gitlab-ci.yml</code>, they would not be part of the script for the <code>production</code><br>job in the combined CI configuration.</p>
+<p>NOTE: <strong>Note:</strong><br>We currently do not support using YAML aliases across different YAML files<br>sourced by <code>include</code>. You must only refer to aliases in the same file.</p>
+<h2 id="variables"><a href="#variables" class="headerlink" title="variables"></a><code>variables</code></h2><blockquote>
+<p>Introduced in GitLab Runner v0.5.0.</p>
+</blockquote>
+<p>NOTE: <strong>Note:</strong><br>Integers (as well as strings) are legal both for variable’s name and value.<br>Floats are not legal and cannot be used.</p>
+<p>GitLab CI/CD allows you to define variables inside <code>.gitlab-ci.yml</code> that are<br>then passed in the job environment. They can be set globally and per-job.<br>When the <code>variables</code> keyword is used on a job level, it overrides the global<br>YAML variables and predefined ones.</p>
+<p>They are stored in the Git repository and are meant to store non-sensitive<br>project configuration, for example:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">variables:</span></span><br><span class="line">  <span class="attr">DATABASE_URL:</span> <span class="string">"postgres://postgres@postgres/my_database"</span></span><br></pre></td></tr></table></figure>
+
+<p>These variables can be later used in all executed commands and scripts.<br>The YAML-defined variables are also set to all created service containers,<br>thus allowing to fine tune them.</p>
+<p>To turn off global defined variables in a specific job, define an empty hash:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">job_name:</span></span><br><span class="line">  <span class="attr">variables:</span> <span class="string">&#123;&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>Except for the user defined variables, there are also the ones <a href="../variables/README.md#predefined-variables-environment-variables">set up by the<br>Runner itself</a>.<br>One example would be <code>CI_COMMIT_REF_NAME</code> which has the value of<br>the branch or tag name for which project is built. Apart from the variables<br>you can set in <code>.gitlab-ci.yml</code>, there are also the so called<br><a href="../variables/README.md#variables">Variables</a><br>which can be set in GitLab’s UI.</p>
+<p><a href="../variables/README.md">Learn more about variables and their priority.</a></p>
+<h3 id="Git-strategy"><a href="#Git-strategy" class="headerlink" title="Git strategy"></a>Git strategy</h3><blockquote>
+<p>Introduced in GitLab 8.9 as an experimental feature.  May change or be removed<br>  completely in future releases. <code>GIT_STRATEGY=none</code> requires GitLab Runner<br>  v1.7+.</p>
+</blockquote>
+<p>You can set the <code>GIT_STRATEGY</code> used for getting recent application code, either<br>globally or per-job in the <a href="#variables"><code>variables</code></a> section. If left<br>unspecified, the default from project settings will be used.</p>
+<p>There are three possible values: <code>clone</code>, <code>fetch</code>, and <code>none</code>.</p>
+<p><code>clone</code> is the slowest option. It clones the repository from scratch for every<br>job, ensuring that the project workspace is always pristine.</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">variables:</span></span><br><span class="line">  <span class="attr">GIT_STRATEGY:</span> <span class="string">clone</span></span><br></pre></td></tr></table></figure>
+
+<p><code>fetch</code> is faster as it re-uses the project workspace (falling back to <code>clone</code><br>if it doesn’t exist). <code>git clean</code> is used to undo any changes made by the last<br>job, and <code>git fetch</code> is used to retrieve commits made since the last job ran.</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">variables:</span></span><br><span class="line">  <span class="attr">GIT_STRATEGY:</span> <span class="string">fetch</span></span><br></pre></td></tr></table></figure>
+
+<p><code>none</code> also re-uses the project workspace, but skips all Git operations<br>(including GitLab Runner’s pre-clone script, if present). It is mostly useful<br>for jobs that operate exclusively on artifacts (e.g., <code>deploy</code>). Git repository<br>data may be present, but it is certain to be out of date, so you should only<br>rely on files brought into the project workspace from cache or artifacts.</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">variables:</span></span><br><span class="line">  <span class="attr">GIT_STRATEGY:</span> <span class="string">none</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Git-submodule-strategy"><a href="#Git-submodule-strategy" class="headerlink" title="Git submodule strategy"></a>Git submodule strategy</h3><blockquote>
+<p>Requires GitLab Runner v1.10+.</p>
+</blockquote>
+<p>The <code>GIT_SUBMODULE_STRATEGY</code> variable is used to control if / how Git<br>submodules are included when fetching the code before a build. You can set them<br>globally or per-job in the <a href="#variables"><code>variables</code></a> section.</p>
+<p>There are three possible values: <code>none</code>, <code>normal</code>, and <code>recursive</code>:</p>
+<ul>
+<li><p><code>none</code> means that submodules will not be included when fetching the project<br>code. This is the default, which matches the pre-v1.10 behavior.</p>
+</li>
+<li><p><code>normal</code> means that only the top-level submodules will be included. It is<br>equivalent to:</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git submodule sync</span><br><span class="line">git submodule update --init</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>recursive</code> means that all submodules (including submodules of submodules)<br>will be included. It is equivalent to:</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git submodule sync --recursive</span><br><span class="line">git submodule update --init --recursive</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>Note that for this feature to work correctly, the submodules must be configured<br>(in <code>.gitmodules</code>) with either:</p>
+<ul>
+<li>the HTTP(S) URL of a publicly-accessible repository, or</li>
+<li>a relative path to another repository on the same GitLab server. See the<br><a href="../git_submodules.md">Git submodules</a> documentation.</li>
+</ul>
+<h3 id="Git-checkout"><a href="#Git-checkout" class="headerlink" title="Git checkout"></a>Git checkout</h3><blockquote>
+<p>Introduced in GitLab Runner 9.3</p>
+</blockquote>
+<p>The <code>GIT_CHECKOUT</code> variable can be used when the <code>GIT_STRATEGY</code> is set to either<br><code>clone</code> or <code>fetch</code> to specify whether a <code>git checkout</code> should be run. If not<br>specified, it defaults to true. You can set them globally or per-job in the<br><a href="#variables"><code>variables</code></a> section.</p>
+<p>If set to <code>false</code>, the Runner will:</p>
+<ul>
+<li>when doing <code>fetch</code> - update the repository and leave working copy on<br>the current revision,</li>
+<li>when doing <code>clone</code> - clone the repository and leave working copy on the<br>default branch.</li>
+</ul>
+<p>Having this setting set to <code>true</code> will mean that for both <code>clone</code> and <code>fetch</code><br>strategies the Runner will checkout the working copy to a revision related<br>to the CI pipeline:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">variables:</span></span><br><span class="line">  <span class="attr">GIT_STRATEGY:</span> <span class="string">clone</span></span><br><span class="line">  <span class="attr">GIT_CHECKOUT:</span> <span class="string">"false"</span></span><br><span class="line"><span class="attr">script:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">git</span> <span class="string">checkout</span> <span class="string">master</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">git</span> <span class="string">merge</span> <span class="string">$CI_BUILD_REF_NAME</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Job-stages-attempts"><a href="#Job-stages-attempts" class="headerlink" title="Job stages attempts"></a>Job stages attempts</h3><blockquote>
+<p>Introduced in GitLab, it requires GitLab Runner v1.9+.</p>
+</blockquote>
+<p>You can set the number for attempts the running job will try to execute each<br>of the following stages:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>GET_SOURCES_ATTEMPTS</strong></td>
+<td>Number of attempts to fetch sources running a job</td>
+</tr>
+<tr>
+<td><strong>ARTIFACT_DOWNLOAD_ATTEMPTS</strong></td>
+<td>Number of attempts to download artifacts running a job</td>
+</tr>
+<tr>
+<td><strong>RESTORE_CACHE_ATTEMPTS</strong></td>
+<td>Number of attempts to restore the cache running a job</td>
+</tr>
+</tbody></table>
+<p>The default is one single attempt.</p>
+<p>Example:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">variables:</span></span><br><span class="line">  <span class="attr">GET_SOURCES_ATTEMPTS:</span> <span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<p>You can set them globally or per-job in the <a href="#variables"><code>variables</code></a> section.</p>
+<h3 id="Shallow-cloning"><a href="#Shallow-cloning" class="headerlink" title="Shallow cloning"></a>Shallow cloning</h3><blockquote>
+<p>Introduced in GitLab 8.9 as an experimental feature. May change in future<br>releases or be removed completely.</p>
+</blockquote>
+<p>You can specify the depth of fetching and cloning using <code>GIT_DEPTH</code>. This allows<br>shallow cloning of the repository which can significantly speed up cloning for<br>repositories with a large number of commits or old, large binaries. The value is<br>passed to <code>git fetch</code> and <code>git clone</code>.</p>
+<blockquote>
+<p><strong>Note:</strong><br>If you use a depth of 1 and have a queue of jobs or retry<br>jobs, jobs may fail.</p>
+</blockquote>
+<p>Since Git fetching and cloning is based on a ref, such as a branch name, Runners<br>can’t clone a specific commit SHA. If there are multiple jobs in the queue, or<br>you are retrying an old job, the commit to be tested needs to be within the<br>Git history that is cloned. Setting too small a value for <code>GIT_DEPTH</code> can make<br>it impossible to run these old commits. You will see <code>unresolved reference</code> in<br>job logs. You should then reconsider changing <code>GIT_DEPTH</code> to a higher value.</p>
+<p>Jobs that rely on <code>git describe</code> may not work correctly when <code>GIT_DEPTH</code> is<br>set since only part of the Git history is present.</p>
+<p>To fetch or clone only the last 3 commits:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">variables:</span></span><br><span class="line">  <span class="attr">GIT_DEPTH:</span> <span class="string">"3"</span></span><br></pre></td></tr></table></figure>
+
+<p>You can set it globally or per-job in the <a href="#variables"><code>variables</code></a> section.</p>
+<h2 id="Special-YAML-features"><a href="#Special-YAML-features" class="headerlink" title="Special YAML features"></a>Special YAML features</h2><p>It’s possible to use special YAML features like anchors (<code>&amp;</code>), aliases (<code>*</code>)<br>and map merging (<code>&lt;&lt;</code>), which will allow you to greatly reduce the complexity<br>of <code>.gitlab-ci.yml</code>.</p>
+<p>Read more about the various <span class="exturl" data-url="aHR0cHM6Ly9sZWFybnhpbnltaW51dGVzLmNvbS9kb2NzL3lhbWwv" title="https://learnxinyminutes.com/docs/yaml/">YAML features<i class="fa fa-external-link"></i></span>.</p>
+<h3 id="Hidden-keys-jobs"><a href="#Hidden-keys-jobs" class="headerlink" title="Hidden keys (jobs)"></a>Hidden keys (jobs)</h3><blockquote>
+<p>Introduced in GitLab 8.6 and GitLab Runner v1.1.1.</p>
+</blockquote>
+<p>If you want to temporarily ‘disable’ a job, rather than commenting out all the<br>lines where the job is defined:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#hidden_job:</span><br><span class="line">#  script:</span><br><span class="line">#    - run test</span><br></pre></td></tr></table></figure>
+
+<p>you can instead start its name with a dot (<code>.</code>) and it will not be processed by<br>GitLab CI. In the following example, <code>.hidden_job</code> will be ignored:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">.hidden_job:</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">run</span> <span class="string">test</span></span><br></pre></td></tr></table></figure>
+
+<p>Use this feature to ignore jobs, or use the<br><a href="#special-yaml-features">special YAML features</a> and transform the hidden keys<br>into templates.</p>
+<h3 id="Anchors"><a href="#Anchors" class="headerlink" title="Anchors"></a>Anchors</h3><blockquote>
+<p>Introduced in GitLab 8.6 and GitLab Runner v1.1.1.</p>
+</blockquote>
+<p>YAML has a handy feature called ‘anchors’, which lets you easily duplicate<br>content across your document. Anchors can be used to duplicate/inherit<br>properties, and is a perfect example to be used with <a href="#hidden-keys-jobs">hidden keys</a><br>to provide templates for your jobs.</p>
+<p>The following example uses anchors and map merging. It will create two jobs,<br><code>test1</code> and <code>test2</code>, that will inherit the parameters of <code>.job_template</code>, each<br>having their own custom <code>script</code> defined:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">.job_template:</span> <span class="string">&amp;job_definition</span>  <span class="comment"># Hidden key that defines an anchor named 'job_definition'</span></span><br><span class="line">  <span class="attr">image:</span> <span class="string">ruby:2.1</span></span><br><span class="line">  <span class="attr">services:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">postgres</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">redis</span></span><br><span class="line"></span><br><span class="line"><span class="attr">test1:</span></span><br><span class="line">  <span class="string">&lt;&lt;:</span> <span class="string">*job_definition</span>           <span class="comment"># Merge the contents of the 'job_definition' alias</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">test1</span> <span class="string">project</span></span><br><span class="line"></span><br><span class="line"><span class="attr">test2:</span></span><br><span class="line">  <span class="string">&lt;&lt;:</span> <span class="string">*job_definition</span>           <span class="comment"># Merge the contents of the 'job_definition' alias</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">test2</span> <span class="string">project</span></span><br></pre></td></tr></table></figure>
+
+<p><code>&amp;</code> sets up the name of the anchor (<code>job_definition</code>), <code>&lt;&lt;</code> means “merge the<br>given hash into the current one”, and <code>*</code> includes the named anchor<br>(<code>job_definition</code> again). The expanded version looks like this:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">.job_template:</span></span><br><span class="line">  <span class="attr">image:</span> <span class="string">ruby:2.1</span></span><br><span class="line">  <span class="attr">services:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">postgres</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">redis</span></span><br><span class="line"></span><br><span class="line"><span class="attr">test1:</span></span><br><span class="line">  <span class="attr">image:</span> <span class="string">ruby:2.1</span></span><br><span class="line">  <span class="attr">services:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">postgres</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">redis</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">test1</span> <span class="string">project</span></span><br><span class="line"></span><br><span class="line"><span class="attr">test2:</span></span><br><span class="line">  <span class="attr">image:</span> <span class="string">ruby:2.1</span></span><br><span class="line">  <span class="attr">services:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">postgres</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">redis</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">test2</span> <span class="string">project</span></span><br></pre></td></tr></table></figure>
+
+<p>Let’s see another one example. This time we will use anchors to define two sets<br>of services. This will create two jobs, <code>test:postgres</code> and <code>test:mysql</code>, that<br>will share the <code>script</code> directive defined in <code>.job_template</code>, and the <code>services</code><br>directive defined in <code>.postgres_services</code> and <code>.mysql_services</code> respectively:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">.job_template:</span> <span class="meta">&amp;job_definition</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">test</span> <span class="string">project</span></span><br><span class="line"></span><br><span class="line"><span class="string">.postgres_services:</span></span><br><span class="line">  <span class="attr">services:</span> <span class="meta">&amp;postgres_definition</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">postgres</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">ruby</span></span><br><span class="line"></span><br><span class="line"><span class="string">.mysql_services:</span></span><br><span class="line">  <span class="attr">services:</span> <span class="meta">&amp;mysql_definition</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">mysql</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">ruby</span></span><br><span class="line"></span><br><span class="line"><span class="attr">test:postgres:</span></span><br><span class="line">  <span class="string">&lt;&lt;:</span> <span class="meta">*job_definition</span></span><br><span class="line">  <span class="attr">services:</span> <span class="meta">*postgres_definition</span></span><br><span class="line"></span><br><span class="line"><span class="attr">test:mysql:</span></span><br><span class="line">  <span class="string">&lt;&lt;:</span> <span class="meta">*job_definition</span></span><br><span class="line">  <span class="attr">services:</span> <span class="meta">*mysql_definition</span></span><br></pre></td></tr></table></figure>
+
+<p>The expanded version looks like this:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">.job_template:</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">test</span> <span class="string">project</span></span><br><span class="line"></span><br><span class="line"><span class="string">.postgres_services:</span></span><br><span class="line">  <span class="attr">services:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">postgres</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">ruby</span></span><br><span class="line"></span><br><span class="line"><span class="string">.mysql_services:</span></span><br><span class="line">  <span class="attr">services:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">mysql</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">ruby</span></span><br><span class="line"></span><br><span class="line"><span class="attr">test:postgres:</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">test</span> <span class="string">project</span></span><br><span class="line">  <span class="attr">services:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">postgres</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">ruby</span></span><br><span class="line"></span><br><span class="line"><span class="attr">test:mysql:</span></span><br><span class="line">  <span class="attr">script:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">test</span> <span class="string">project</span></span><br><span class="line">  <span class="attr">services:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">mysql</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">ruby</span></span><br></pre></td></tr></table></figure>
+
+<p>You can see that the hidden keys are conveniently used as templates.</p>
+<h2 id="Triggers"><a href="#Triggers" class="headerlink" title="Triggers"></a>Triggers</h2><p>Triggers can be used to force a rebuild of a specific branch, tag or commit,<br>with an API call.</p>
+<p><a href="../triggers/README.md">Read more in the triggers documentation.</a></p>
+<h2 id="Skipping-jobs"><a href="#Skipping-jobs" class="headerlink" title="Skipping jobs"></a>Skipping jobs</h2><p>If your commit message contains <code>[ci skip]</code> or <code>[skip ci]</code>, using any<br>capitalization, the commit will be created but the pipeline will be skipped.</p>
+<h2 id="Validate-the-gitlab-ci-yml"><a href="#Validate-the-gitlab-ci-yml" class="headerlink" title="Validate the .gitlab-ci.yml"></a>Validate the .gitlab-ci.yml</h2><p>Each instance of GitLab CI has an embedded debug tool called Lint, which validates the<br>content of your <code>.gitlab-ci.yml</code> files. You can find the Lint under the page <code>ci/lint</code> of your<br>project namespace (e.g, <code>http://gitlab-example.com/gitlab-org/project-123/-/ci/lint</code>)</p>
+<h2 id="Using-reserved-keywords"><a href="#Using-reserved-keywords" class="headerlink" title="Using reserved keywords"></a>Using reserved keywords</h2><p>If you get validation error when using specific values (e.g., <code>true</code> or <code>false</code>),<br>try to quote them, or change them to a different form (e.g., <code>/bin/true</code>).</p>
+<h2 id="Examples"><a href="#Examples" class="headerlink" title="Examples"></a>Examples</h2><p>Visit the <a href="../examples/README.md">examples README</a> to see a list of examples using GitLab<br>CI with various languages.</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.coocn.cn/2020/03/25/k8s-metrics-server-error-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/apple-touch-icon-next.png">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/25/k8s-metrics-server-error-1/" class="post-title-link" itemprop="url">kubernetes 部署 metrics-server 提示  no metrics known for pod 或者 x509: cannot validate certificate 的解决方案和详细原因分析</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-25 10:05:37 / 修改时间：10:09:33" itemprop="dateCreated datePublished" datetime="2020-03-25T10:05:37+08:00">2020-03-25</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/25/k8s-metrics-server-error-1/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/25/k8s-metrics-server-error-1/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>给部署添加如下命令行即可：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">args:</span><br><span class="line">  - &#39;--kubelet-preferred-address-types&#x3D;InternalIP&#39;</span><br><span class="line">  - &#39;--kubelet-insecure-tls&#39;</span><br></pre></td></tr></table></figure>
+
+<h1 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h1><p><strong>那么是什么导致了 <code>metrics-server</code> 启动提示<code>no metrics known for pod</code>?</strong></p>
+<ol>
+<li>首先需要知道的是<code>metrics-server</code>默认会使用<code>hostname</code> 来进行通讯。</li>
+<li>如果没有进行相应配置的话，那么通过<code>hostname</code>是无法正常通讯的。</li>
+<li>所以使用默认命令行启动，由于无法正常通过<code>hostname</code>通信就会产生错误， 从而提示<code>no metrics known for pod</code>。</li>
+</ol>
+<p><strong>好了，既然知道问题，我们来找一下怎么解决。</strong></p>
+<p>实际上<code>metrics-server</code>不只支持通过<code>hostname</code>进行通讯，还支持使用<code>IP</code>来进行通讯，只不过需要显式指定命令行参数：</p>
+<blockquote>
+<p><code>--kubelet-preferred-address-types=InternalIP</code></p>
+</blockquote>
+<p>其中<code>InternalIP</code>可以修改为以下值:</p>
+<p><code>InternalIP</code>,<code>Hostname</code>,<code>InternalDNS</code>,<code>ExternalDNS</code>,<code>ExternalIP</code> <strong><em>(具体含义这里就不展开了，感兴趣的可以自行了解。)</em></strong></p>
+<p>但是呢，事情到这里还没有结束，当你加上命令行参数后，会发现出现另一个错误<code>x509: cannot validate certificate</code>。</p>
+<p>这是由于证书验证不通过导致的，所以我们需要让<code>metrics-server</code>忽略掉证书错误。而忽略证书错误也是有命令行支持的，我们添加如下命令行参数就可以解决了：</p>
+<blockquote>
+<p><code>--kubelet-insecure-tls</code></p>
+</blockquote>
+<p><strong>到此，通过添加两个命令行就彻底解决了 <code>metrics-server</code> 启动提示<code>no metrics known for pod</code>的问题。</strong></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.coocn.cn/2020/03/25/k8s-coredns-add-hosts/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/apple-touch-icon-next.png">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/25/k8s-coredns-add-hosts/" class="post-title-link" itemprop="url">通过 coredns 给 kubernetes 添加自定义DNS解析记录</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-25 09:52:36 / 修改时间：10:01:18" itemprop="dateCreated datePublished" datetime="2020-03-25T09:52:36+08:00">2020-03-25</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/25/k8s-coredns-add-hosts/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/25/k8s-coredns-add-hosts/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p><code>coredns</code> 允许通过自带的 <code>hosts</code> 插件像配置本地<code>hosts</code>文件一样添加自定义<code>dns</code>解析。 </p>
+<h2 id="通过-ConfigMap-添加自定义解析"><a href="#通过-ConfigMap-添加自定义解析" class="headerlink" title="通过 ConfigMap 添加自定义解析"></a>通过 ConfigMap 添加自定义解析</h2><p>通过在命名空间 <code>kube-system</code> 中找到类型为 <code>configMap</code> ，名称为 <code>coredns</code> 的配置文件配置。<br>在配置中添加如下设置就能将我们的自定义解析添加到<code>coredns</code>中。<br><strong><em>文中将 <code>redis</code> 和 <code>redis.connect.co</code> 解析到地址 <code>172.21.91.28</code></em></strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">hosts &#123;</span><br><span class="line">    172.21.91.28 redis</span><br><span class="line">    172.21.91.28 redis.connect.co</span><br><span class="line">      </span><br><span class="line">    fallthrough</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>修改后文件如下<code>（根据kubernetes 安装方式不同，内容可能会有些许差别）</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">.:53 &#123;</span><br><span class="line">    errors</span><br><span class="line">    health</span><br><span class="line">    kubernetes cluster.local in-addr.arpa ip6.arpa &#123;</span><br><span class="line">       pods insecure</span><br><span class="line">       upstream</span><br><span class="line">       fallthrough in-addr.arpa ip6.arpa</span><br><span class="line">    &#125;</span><br><span class="line">    hosts &#123;</span><br><span class="line">        172.21.91.28 redis</span><br><span class="line">        172.21.91.28 redis.connect.co</span><br><span class="line">          </span><br><span class="line">        fallthrough</span><br><span class="line">    &#125;</span><br><span class="line">    prometheus :9153</span><br><span class="line">    proxy . &#x2F;etc&#x2F;resolv.conf</span><br><span class="line">    cache 30</span><br><span class="line">    loop</span><br><span class="line">    reload</span><br><span class="line">    loadbalance</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.coocn.cn/2020/03/25/git-nouns/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/apple-touch-icon-next.png">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/25/git-nouns/" class="post-title-link" itemprop="url">Git 团队协作中WIP PTAL CC LGTM IIRC 等常用术语含义解释</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-25 09:48:39 / 修改时间：09:49:43" itemprop="dateCreated datePublished" datetime="2020-03-25T09:48:39+08:00">2020-03-25</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/25/git-nouns/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/25/git-nouns/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <ul>
+<li><code>WIP</code>   Work in progress, do not merge yet. // 开发中</li>
+<li><code>LGTM</code> Looks good to me. // Riview 完别人的 PR ，没有问题</li>
+<li><code>PTAL</code> Please take a look. // 帮我看下，一般都是请别人 review 自己的 PR</li>
+<li><code>CC</code> Carbon copy // 一般代表抄送别人的意思</li>
+<li><code>RFC</code>  —  request for comments. // 我觉得这个想法很好, 我们来一起讨论下</li>
+<li><code>IIRC</code>  —  if I recall correctly. // 如果我没记错</li>
+<li><code>ACK</code>  —  acknowledgement. // 我确认了或者我接受了,我承认了</li>
+<li><code>NACK/NAK</code> — negative acknowledgement. // 我不同意</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.coocn.cn/2020/03/25/micro-server-introduction/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/apple-touch-icon-next.png">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/25/micro-server-introduction/" class="post-title-link" itemprop="url">微服务优势和劣势分析，微服务相关概念及微服务架构优点缺点介绍</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-25 09:35:55 / 修改时间：09:47:15" itemprop="dateCreated datePublished" datetime="2020-03-25T09:35:55+08:00">2020-03-25</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/25/micro-server-introduction/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/25/micro-server-introduction/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="I-什么是微服务架构"><a href="#I-什么是微服务架构" class="headerlink" title="I.    什么是微服务架构?"></a>I.    什么是微服务架构?</h1><p>通常而言，微服务架构是一种架构模式或者说是一种架构风格。<br>它提倡将单一应用程序划分成一组小的服务，每个服务运行独立的自己的进程中，服务之间互相协调、互相配合，为用户提供最终价值。<br>服务之间采用轻量级的通信机制互相沟通（通常是基于 HTTP 的 RESTful API) 。每个服务都围绕着具体业务进行构建，并且能够被独立地部署到生产环境、类生产环境等。</p>
+<h1 id="II-微服务架构和单体架构的区别"><a href="#II-微服务架构和单体架构的区别" class="headerlink" title="II.    微服务架构和单体架构的区别"></a>II.    微服务架构和单体架构的区别</h1><h2 id="A-单体架构"><a href="#A-单体架构" class="headerlink" title="A.    单体架构"></a>A.    单体架构</h2><p>通俗地讲，“单体应用（monolith application）”就是将应用程序的所有功能都打包成一个独立的单元，可以是JAR、EXE、BIN或其它归档格式。</p>
+<p><img src="/2020/03/25/micro-server-introduction/mono-app.png" alt="单体应用"></p>
+<p><strong>单体应用有如下优点：</strong></p>
+<ol>
+<li>开发简单直接，集中式管理, 基本不会重复开发</li>
+<li>功能都在本地，没有分布式的管理开销和调用开销。</li>
+</ol>
+<p><strong>它的缺点也非常明显，特别对于互联网公司来说：</strong></p>
+<ol>
+<li>开发效率低：所有的开发在一个项目改代码，递交代码相互等待，代码冲突不断</li>
+<li>代码维护难：代码功能耦合在一起，新人不知道何从下手</li>
+<li>部署不灵活：构建时间长，任何小修改必须重新构建整个项目，这个过程往往很长</li>
+<li>稳定性不高：一个微不足道的小问题，可以导致整个应用挂掉</li>
+<li>扩展性不够：无法满足高并发情况下的业务需求<br>##B.    微服务架构<br>随着业务需求的快速发展变化，敏捷性、灵活性和可扩展性需求不断增长，迫切需要一种更加快速高效的软件交付方式。微服务就是一种可以满足这种需求的软件架构风格。单体应用被分解成多个更小的服务，每个服务有自己的归档文件，单独部署，然后共同组成一个应用程序。这里的“微”不是针对代码行数而言，而是说服务的范围限定到单个功能。</li>
+</ol>
+<p><img src="/2020/03/25/micro-server-introduction/micro-app.png" alt="微服务应用"></p>
+<p><strong>微服务有如下优点：</strong></p>
+<ol>
+<li>微服务是松藕合的，无论是在开发阶段或部署阶段都是独立的。</li>
+<li>能够快速响应, 局部修改容易, 一个服务出现问题不会影响整个应用。</li>
+<li>易于和第三方应用系统集成, 支持使用不同的语言开发, 允许你利用融合最新技术。</li>
+<li>每个微服务都很小，足够内聚，足够小，代码容易理解。团队能够更关注自己的工作成果, 聚焦指定的业务功能或业务需求。</li>
+<li>开发简单、开发效率提高，一个服务可能就是专一的只干一件事, 能够被小团队单独开发，这个小团队可以是 2 到 5 人的开发人员组成。</li>
+</ol>
+<p><strong>同样的, 也存在如下缺点:</strong></p>
+<ol>
+<li>微服务架构带来过多的运维操作, 可能需要团队具备一定的 DevOps 技巧.</li>
+<li>分布式系统可能复杂难以管理。因为分布部署跟踪问题难。当服务数量增加，管理复杂性增加。<h1 id="III-微服务架构的主要特点"><a href="#III-微服务架构的主要特点" class="headerlink" title="III.    微服务架构的主要特点"></a>III.    微服务架构的主要特点</h1>微服务架构是一种松耦合的、有一定的有界上下文的面向服务架构。也就是说，如果遇到一个功能变更, 但其要求每个服务都要同时修改，那么它们就不能称之为微服务，因为它们紧耦合在一起；如果你需要掌握一个服务的上下文场景使用条件，那么它就是一个有上下文边界的服务，这个定义一般来自DDD(领域驱动设计)。</li>
+</ol>
+<p><strong>它的主要特点是组件化、松耦合、自治、去中心化，体现在以下几个方面：</strong></p>
+<p>*<em>A.    细粒度的服务分解 *</em><br>服务粒度要小，而每个服务是针对一个单一职责的业务能力的封装，专注做好一件事情。<br>*<em>B.    独立部署运行和扩展 *</em><br>每个服务能够独立被部署并运行在一个进程内。这种运行和部署方式能够赋予系统灵活的代码组织方式和发布节奏，使得快速交付和应对变化成为可能。<br>*<em>C.    独立开发和演化 *</em><br>技术选型灵活，不受遗留系统技术约束。合适的业务问题选择合适的技术可以独立演化。服务与服务之间采取与语言无关的API进行集成。相对单体架构，微服务架构是更面向业务创新的一种架构模式。<br>*<em>D.    独立团队和自治 *</em><br>团队对服务的整个生命周期负责，工作在独立的上下文中，自己决策自己治理，而不需要统一的指挥中心。团队和团队之间通过松散的社区部落进行衔接。</p>
+<p>通过解耦我们所做的事情，分而治之以减少不必要的损耗，使得整个复杂的系统和组织能够快速的应对变化。</p>
+<h1 id="IV-需要考虑的问题"><a href="#IV-需要考虑的问题" class="headerlink" title="IV.    需要考虑的问题"></a>IV.    需要考虑的问题</h1><ol>
+<li>单个微服务代码量小，易修改和维护。但是，系统复杂度的总量是不变的，每个服务代码少了，但服务的个数肯定就多了。就跟拼图游戏一样，切的越碎，越难拼出整幅图。一个系统被拆分成零碎的微服务，最后要集成为一个完整的系统，其复杂度肯定比大块的功能集成要高很多。</li>
+<li>单个微服务数据独立，可独立部署和运行。虽然微服务本身是可以独立部署和运行的，但仍然避免不了业务上的你来我往，这就涉及到要对外通信，当微服务的数量达到一定量级的时候，如何提供一个高效的集群通信机制成为一个问题。</li>
+<li>单个微服务拥有自己的进程，进程本身就可以动态的启停，为无缝升级打好了基础，但谁来启动和停止进程，什么时机，选择在哪台设备上做这件事情才是无缝升级的关键。这个能力并不是微服务本身提供的，而是需要背后强大的版本管理和部署能力。</li>
+<li>多个相同的微服务可以做负载均衡，提高性能和可靠性。正是因为相同微服务可以有多个不同实例，让服务按需动态伸缩成为可能，在高峰期可以启动更多的相同的微服务实例为更多用户服务，以此提高响应速度。同时这种机制也提供了高可靠性，在某个微服务故障后，其他相同的微服务可以接替其工作，对外表现为某个设备故障后业务不中断。同样的道理，微服务本身是不会去关心系统负载的，那么什么时候应该启动更多的微服务，多个微服务的流量应该如何调度和分发，这背后也有一套复杂的负载监控和均衡的系统在起作用。</li>
+<li>微服务可以独立部署和对外提供服务，微服务的业务上线和下线是动态的，当一个新的微服务上线时，用户是如何访问到这种新的服务？这就需要有一个统一的入口，新的服务可以动态的注册到这个入口上，用户每次访问时可以从这个入口拿到系统所有服务的访问地址。这个统一的系统入口并不是微服务本身的一部分，所以这种能力需要系统单独提供。</li>
+<li>还有一些企业级关注的系统问题，比如，安全策略如何集中管理？系统故障如何快速审计和跟踪到具体服务？整个系统状态如何监控？服务之间的依赖关系如何管理？等等这些问题都不是单个微服务考虑的范畴，而需要有一个系统性的考虑和设计，让每个微服务都能够按照系统性的要求和约束提供对应的安全性，可靠性，可维护性的能力。</li>
+</ol>
+<h1 id="V-选择微服务框架的关注点"><a href="#V-选择微服务框架的关注点" class="headerlink" title="V.    选择微服务框架的关注点"></a>V.    选择微服务框架的关注点</h1><ol>
+<li>服务注册、发现、负载均衡和健康检查，假定采用进程内LB方案，那么服务自注册一般统一做在服务器端框架中，健康检查逻辑由具体业务服务定制，框架层提供调用健康检查逻辑的机制，服务发现和负载均衡则集成在服务客户端框架中。</li>
+<li>监控日志，框架一方面要记录重要的框架层日志、metrics和调用链数据，还要将日志、metrics等接口暴露出来，让业务层能根据需要记录业务日志数据。在运行环境中，所有日志数据一般集中落地到企业后台日志系统，做进一步分析和处理。</li>
+<li>REST/RPC和序列化，框架层要支持将业务逻辑以HTTP/REST或者RPC方式暴露出来，HTTP/REST是当前主流API暴露方式，在性能要求高的场合则可采用Binary/RPC方式。针对当前多样化的设备类型(浏览器、普通PC、无线设备等)，框架层要支持可定制的序列化机制，例如，对浏览器，框架支持输出Ajax友好的JSON消息格式，而对内部服务及应用程序，框架支持输出性能高的Binary消息格式。</li>
+<li>配置，除了支持普通配置文件方式的配置，框架层还可集成动态运行时配置，能够在运行时针对不同环境动态调整服务的参数和配置。</li>
+<li>限流和容错，框架集成限流容错组件，能够在运行时自动限流和容错，保护服务，如果进一步和动态配置相结合，还可以实现动态限流和熔断。</li>
+<li>管理接口，框架集成管理接口，一方面可以在线查看框架和服务内部状态，同时还可以动态调整内部状态，对调试、监控和管理能提供快速反馈。Spring Boot微框架的Actuator模块就是一个强大的管理接口。</li>
+<li>统一错误处理，对于框架层和服务的内部异常，如果框架层能够统一处理并记录日志，对服务监控和快速问题定位有很大帮助。</li>
+<li>安全，安全和访问控制逻辑可以在框架层统一进行封装，可做成插件形式，具体业务服务根据需要加载相关安全插件。</li>
+<li>文档自动生成，文档的书写和同步一直是一个痛点，框架层如果能支持文档的自动生成和同步，会给使用API的开发和测试人员带来极大便利。Swagger是一种流行Restful API的文档方案。</li>
+</ol>
+<p><strong>一个完整的微服务系统，它最少要包含以下功能：</strong></p>
+<ol>
+<li>日志和审计，主要是日志的汇总，分类和查询</li>
+<li>监控和告警，主要是监控每个服务的状态，必要时产生告警</li>
+<li>消息总线，轻量级的MQ或HTTP</li>
+<li>注册发现</li>
+<li>负载均衡</li>
+<li>部署和升级</li>
+<li>事件调度机制</li>
+</ol>
+<p><strong>以下功能不是最小集的一部分，但也应该在选择时进行考虑：</strong></p>
+<ol>
+<li>认证和鉴权</li>
+<li>多语言支持, 是否支持多种编程语言</li>
+<li>统一服务构建和打包</li>
+<li>统一服务测试</li>
+<li>统一配置文件管理</li>
+<li>服务依赖关系管理</li>
+<li>问题跟踪调试框架</li>
+<li>灰度发布</li>
+<li>蓝绿部署</li>
+<li>资源管理，如：底层的容器, 虚拟机, 物理机和网络管理<h1 id="VI-开发方式影响"><a href="#VI-开发方式影响" class="headerlink" title="VI.    开发方式影响"></a>VI.    开发方式影响</h1>随着持续交付概念推广以及容器概念的普及，微服务将这两种理念和技术结合起来，形成新的微服务+API + 容器平台的开发模式，提出了容器化微服务的持续交付概念。<br>下图为传统单体应用的DevOps开发队伍方式：<br><img src="/2020/03/25/micro-server-introduction/mono-devops.png" alt="单体应用-devpos"><br>这种整体型架构要求产品队伍横跨产品管理 Dev开发 QA DBA 以及系统运营管理，而微服务架构引入以后，如下图：<br><img src="/2020/03/25/micro-server-introduction/micro-devpos.png" alt="微服务-devpos"><br>微服务促进了DevOps方式的重组，将一个大臃肿的整体产品开发队伍切分为根据不同微服务的划分的产品队伍，以及一个大的整体的平台队伍负责运营管理，两者之间通过API交互，做到了松耦合隔绝。</li>
+</ol>
+<p><img src="/2020/03/25/micro-server-introduction/micro-devpos-2.png" alt="微服务-devpos2"></p>
+<p>微服务的实施是有一定的先决条件：基础的运维能力（如监控、快速配置、快速部署）需提前构建，否则就会陷入较被动的局面。推荐采用CI/CI改进基础设施及运维的实践，通过自动化运维使得可以快速安全的响应和处理微服务对服务部署的要求，通过容器技术保证服务环境之间拥有更高的一致性，降低“在我的环境工作，而你的环境不工作”的可能，也是为后续的发布策略和运维提供更好的支撑。<br>想要更好的实施微服务, 首先需要考虑构建团队DevOps能力，这是保证微服务架构在持续交付和应对复杂运维问题的动力之源；<br>其次保持服务持续演进，使之能够快速、低成本地被拆分和合并，以快速响应业务的变化；同时要保持团队和架构对齐。微服务看似是技术层面的变革，但它对团队结构和组织文化有很强的要求和影响。识别和构建匹配架构的团队是解决问题的另一大支柱。<br>最后，打造持续改进的组织文化是实施微服务的关键基石。只有持续改进，持续学习和反馈，持续打造这样一个文化氛围和团队，微服务架构才能持续发展下去，保持新鲜的生命力，从而实现我们的初衷。</p>
 
       
     </div>
@@ -435,6 +1936,9 @@
   </div>
 
   
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+  </nav>
 
 
 
@@ -501,12 +2005,16 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-count">16</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
-      <div class="site-state-item site-state-tags">
+      <div class="site-state-item site-state-categories">
         <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>

@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.coocn.cn","root":"/","scheme":"Pisces","version":"7.7.2","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Micro 介绍官方网站: micro.mu官方文档: micro.mu&#x2F;docs源码仓库: github.com&#x2F;micro&#x2F;micro Micro 是一个工具集合, 通过将微服务架构抽象成一组工具。隐藏了分布式系统的复杂性，为开发人员提供了更简洁的概念。 组成Micro 主要有三部分组成:  go-micro - 开发 sdk, 包含了 RPC 框架,服务发现, 消息订阅&#x2F; 发布 等功能.go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Golang 微服务框架系列 - 1， Micro 框架使用方式以及架构介绍">
+<meta property="og:url" content="http://blog.coocn.cn/2020/03/25/golang-micro-1/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Micro 介绍官方网站: micro.mu官方文档: micro.mu&#x2F;docs源码仓库: github.com&#x2F;micro&#x2F;micro Micro 是一个工具集合, 通过将微服务架构抽象成一组工具。隐藏了分布式系统的复杂性，为开发人员提供了更简洁的概念。 组成Micro 主要有三部分组成:  go-micro - 开发 sdk, 包含了 RPC 框架,服务发现, 消息订阅&#x2F; 发布 等功能.go">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://blog.coocn.cn/2020/03/25/golang-micro-1/1.png">
+<meta property="article:published_time" content="2020-03-25T01:27:21.000Z">
+<meta property="article:modified_time" content="2020-03-25T01:30:07.055Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://blog.coocn.cn/2020/03/25/golang-micro-1/1.png">
+
+<link rel="canonical" href="http://blog.coocn.cn/2020/03/25/golang-micro-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Golang 微服务框架系列 - 1， Micro 框架使用方式以及架构介绍 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">16</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">3</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">1</span></a>
+
+  </li>
+        <li class="menu-item menu-item-schedule">
+
+    <a href="/schedule/" rel="section"><i class="fa fa-fw fa-calendar"></i>日程表</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-fw fa-heartbeat"></i>公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL3Nzb29y" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.coocn.cn/2020/03/25/golang-micro-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/apple-touch-icon-next.png">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Golang 微服务框架系列 - 1， Micro 框架使用方式以及架构介绍
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-25 09:27:21 / 修改时间：09:30:07" itemprop="dateCreated datePublished" datetime="2020-03-25T09:27:21+08:00">2020-03-25</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/25/golang-micro-1/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/25/golang-micro-1/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Micro-介绍"><a href="#Micro-介绍" class="headerlink" title="Micro 介绍"></a>Micro 介绍</h2><p><span class="exturl" data-url="aHR0cHM6Ly9taWNyby5tdS8=" title="https://micro.mu/">官方网站: micro.mu<i class="fa fa-external-link"></i></span><br><span class="exturl" data-url="aHR0cHM6Ly9taWNyby5tdS9kb2NzLw==" title="https://micro.mu/docs/">官方文档: micro.mu/docs<i class="fa fa-external-link"></i></span><br><span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL21pY3JvL21pY3Jv" title="https://github.com/micro/micro">源码仓库: github.com/micro/micro<i class="fa fa-external-link"></i></span></p>
+<p>Micro 是一个工具集合, 通过将微服务架构抽象成一组工具。隐藏了分布式系统的复杂性，为开发人员提供了更简洁的概念。</p>
+<h3 id="组成"><a href="#组成" class="headerlink" title="组成"></a>组成</h3><p>Micro 主要有三部分组成:</p>
+<blockquote>
+<p>go-micro - 开发 sdk, 包含了 RPC 框架,服务发现, 消息订阅/ 发布 等功能.<br>go-plugins - micro 插件<br>micro - Micro 提供的管理工具, 包含了 API 网关, 仪表盘, RPC 代理等功能.</p>
+</blockquote>
+<h3 id="go-micro"><a href="#go-micro" class="headerlink" title="go-micro"></a>go-micro</h3><p>Micro 的主要开发 SDK, 里面包含了开发所用到的常用功能模块, 主要模块之间关系如下:<br>[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-aMoGDYQl-1585099608719)(<span class="exturl" data-url="aHR0cHM6Ly9taWNyby5tdS9kb2NzL2ltYWdlcy9nby1taWNyby5wbmcpXQ==" title="https://micro.mu/docs/images/go-micro.png)]">https://micro.mu/docs/images/go-micro.png)]<i class="fa fa-external-link"></i></span></p>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>services</td>
+<td>微服务, 提供了对微服务功能开发的封装, 通过它可以快速创建一个微服务.</td>
+</tr>
+<tr>
+<td>client</td>
+<td>RPC 客户端, 提供了诸如 服务发现 / 负载均衡 / RPC 代理和调用。以及失败时的重试 / 超时 / 上下文等功能。</td>
+</tr>
+<tr>
+<td>server</td>
+<td>RPC 服务端, 提供了如何实现 RPC 请求的方法, 功能逻辑主要使用这个实现.</td>
+</tr>
+<tr>
+<td>codec</td>
+<td>数据编码 模块, 提供将程序调用数据转换成 RPC 调用数据的功能. 目前支持: json / protobuf</td>
+</tr>
+<tr>
+<td>broker</td>
+<td>pub/sub 模块, 提供事件 发布 / 订阅 功能, 目前支持: nats / rabbitmq / http(开发)</td>
+</tr>
+<tr>
+<td>transport</td>
+<td>数据传输 模块, 通过抽象实现对传输协议的无缝替换。目前支持: http / rabbitmq / nats</td>
+</tr>
+<tr>
+<td>regediry</td>
+<td>服务发现 模块, 提供 集群的服务发现功能, 目前支持: consul / etcd / memory / kubernetes</td>
+</tr>
+<tr>
+<td>selector</td>
+<td>负载均衡 模块, 当 client 发出请求时, 它负责在多个满足条件的服务器列表中决定使用哪个服务器, 目前支持: 循环 / 哈希 / 黑名单</td>
+</tr>
+</tbody></table>
+<h3 id="go-plugins"><a href="#go-plugins" class="headerlink" title="go-plugins"></a>go-plugins</h3><p>没研究…</p>
+<h3 id="micro-工具"><a href="#micro-工具" class="headerlink" title="micro 工具"></a>micro 工具</h3><p>micro工具 是 Micro 提供的一个管理工具, 主要分为以下几个功能: </p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>api</td>
+<td>API 网关, 将 HTTP 请求转换为 RPC 并转发给相应的服务。</td>
+</tr>
+<tr>
+<td>web</td>
+<td>micro 提供了一个默认管理界面, 并且已 HTTP 方式提供了 对 srv 服务的代理。</td>
+</tr>
+<tr>
+<td>new</td>
+<td>生成模板代码, 帮助你快速创建项目.</td>
+</tr>
+<tr>
+<td>cli</td>
+<td>可以通过命令行来和 micro 交互.</td>
+</tr>
+<tr>
+<td>bot</td>
+<td>机器人? 具体的还没有接触</td>
+</tr>
+<tr>
+<td>proxy</td>
+<td>代理? 还没研究清楚</td>
+</tr>
+</tbody></table>
+<h4 id="micro-api"><a href="#micro-api" class="headerlink" title="micro-api"></a>micro-api</h4><p>API 网关或代理, 将 HTTP 请求转换为 RPC 并转发给相应的服务。以便使用一个入口点来访问微服务.<br>[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-WUJkzbR1-1585099608728)(<span class="exturl" data-url="aHR0cHM6Ly9taWNyby5tdS9kb2NzL2ltYWdlcy9hcGkucG5nKV0=" title="https://micro.mu/docs/images/api.png)]">https://micro.mu/docs/images/api.png)]<i class="fa fa-external-link"></i></span></p>
+<p>使用入门:</p>
+<ul>
+<li>安装</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go get -u github.com&#x2F;micro&#x2F;micro</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>运行<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">micro api</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>使用ACME</p>
+<blockquote>
+<p>需要设置环境变量: MICRO_ENABLE_ACME=true</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">linux:</span><br><span class="line">	MICRO_ENABLE_ACME&#x3D;true micro api</span><br><span class="line">windows:</span><br><span class="line">	set MICRO_ENABLE_ACME&#x3D;true &amp;&amp; micro api</span><br><span class="line">	</span><br><span class="line">也可以指定主机白名单:</span><br><span class="line">linux:</span><br><span class="line">	MICRO_ENABLE_ACME&#x3D;true \</span><br><span class="line">	MICRO_ACME_HOSTS&#x3D;example.com,api.example.com \</span><br><span class="line">	micro api</span><br></pre></td></tr></table></figure>
+
+<p>开启HTTPS</p>
+<blockquote>
+<p>需要设置环境变量: MICRO_ENABLE_TLS=true</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">linux:</span><br><span class="line">	MICRO_ENABLE_TLS&#x3D;true \</span><br><span class="line">	MICRO_TLS_CERT_FILE&#x3D;&#x2F;path&#x2F;to&#x2F;cert \</span><br><span class="line">	MICRO_TLS_KEY_FILE&#x3D;&#x2F;path&#x2F;to&#x2F;key \</span><br><span class="line">	micro api</span><br></pre></td></tr></table></figure>
+<p>设置命名空间</p>
+<blockquote>
+<p>默认名称空间为 go.micro.api, 名称空间和路径用于解析服务名称/方法</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">linux:</span><br><span class="line">	MICRO_NAMESPACE&#x3D;com.example.api micro api</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h4 id="micro-web"><a href="#micro-web" class="headerlink" title="micro-web"></a>micro-web</h4><p>提供了一个仪表盘以及对服务的查看和查询功能. 并且提供了一个对 rpc 的反向代理.</p>
+<p>[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-vQfc6Q2z-1585099608729)(<span class="exturl" data-url="aHR0cHM6Ly9taWNyby5tdS9kb2NzL2ltYWdlcy93ZWIucG5nKV0=" title="https://micro.mu/docs/images/web.png)]">https://micro.mu/docs/images/web.png)]<i class="fa fa-external-link"></i></span></p>
+<p>API:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- &#x2F; (UI)      - 仪表盘</span><br><span class="line">- &#x2F; rpc       - RPC 代理</span><br><span class="line">- &#x2F; stats     - 相关统计信息</span><br><span class="line">- &#x2F; [service] - 查看和查询服务</span><br></pre></td></tr></table></figure>
+
+<p>使用入门:</p>
+<ul>
+<li>安装</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go get github.com&#x2F;micro&#x2F;micro</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>运行</li>
+</ul>
+<p>通常</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">micro web</span><br></pre></td></tr></table></figure>
+
+<p>使用 ACME 加密</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">micro --enable_acme web</span><br><span class="line">也可以指定主机白名单:</span><br><span class="line">micro --enable_acme --acme_hosts&#x3D;example.com,web.example.com web</span><br></pre></td></tr></table></figure>
+
+<p>开启 HTTPS</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">micro --enable_tls --tls_cert_file&#x3D;&#x2F;path&#x2F;to&#x2F;cert --tls_key_file&#x3D;&#x2F;path&#x2F;to&#x2F;key web</span><br></pre></td></tr></table></figure>
+
+<p>修改默认命名空间</p>
+<blockquote>
+<p>默认名称空间为 go.micro.web , 名称空间和路径用于确定反向代理代理的目标</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">micro web --namespace&#x3D;com.example.web</span><br></pre></td></tr></table></figure>
+
+<p>开启统计功能 </p>
+<blockquote>
+<p>可以通过 –enable_stats 标志启用统计信息, 通过 /stats 访问</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">micro --enable_stats web</span><br></pre></td></tr></table></figure>
+
+<p> 在 Micro 架构中, 一个完整的请求流程是这样的: </p>
+<p>api-gateway =&gt; [customer-api | customer-web ] =&gt; customer-srv</p>
+<p>其中 api-gateway 是 有 micro 工具直接提供的, customer-(api | web | srv) 则是 micro中的开发概念.</p>
+<p>在 micro 中, 服务分为三种类型.</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>srv</td>
+<td>srv 是标准的 RPC 服务, 也可以叫做后端服务, 开发人员通常写的就是这种类型. 在 Micro 的设想中, 这一服务永远不会面向用户,属于内部服务.</td>
+</tr>
+<tr>
+<td>api</td>
+<td>提供 HTTP 到 RPC 的转换服务, API 网关默认情况下会将请求转发给它来处理.</td>
+</tr>
+<tr>
+<td>web</td>
+<td>Micro 认为 web 也可以当做微服务来创建</td>
+</tr>
+</tbody></table>
+<h3 id="请求处理流程"><a href="#请求处理流程" class="headerlink" title="请求处理流程"></a>请求处理流程</h3><p><img src="/2020/03/25/golang-micro-1/1.png" alt="请求处理流程"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/25/https-redirect-and-hack/" rel="prev" title="使用 C++ 实现对  http 网站加密内容的监听，修改以及重定向">
+      <i class="fa fa-chevron-left"></i> 使用 C++ 实现对  http 网站加密内容的监听，修改以及重定向
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/25/golang-micro-2/" rel="next" title="Golang 微服务框架系列 - 2， Micro 框架的安装以及运行示例">
+      Golang 微服务框架系列 - 2， Micro 框架的安装以及运行示例 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Micro-介绍"><span class="nav-number">1.</span> <span class="nav-text">Micro 介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#组成"><span class="nav-number">1.1.</span> <span class="nav-text">组成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#go-micro"><span class="nav-number">1.2.</span> <span class="nav-text">go-micro</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#go-plugins"><span class="nav-number">1.3.</span> <span class="nav-text">go-plugins</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#micro-工具"><span class="nav-number">1.4.</span> <span class="nav-text">micro 工具</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#micro-api"><span class="nav-number">1.4.1.</span> <span class="nav-text">micro-api</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#micro-web"><span class="nav-number">1.4.2.</span> <span class="nav-text">micro-web</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#请求处理流程"><span class="nav-number">1.5.</span> <span class="nav-text">请求处理流程</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="John Doe"
+      src="/images/apple-touch-icon-next.png">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL3Nzb29y" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ssoor"><i class="fa fa-fw fa-github"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="bWFpbHRvOnlvdXJuYW1lQGdtYWlsLmNvbQ==" title="E-Mail → mailto:yourname@gmail.com"><i class="fa fa-fw fa-envelope"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9naXR0ZXIuaW0vdGhlbWUtbmV4dA==" title="Gitter → https:&#x2F;&#x2F;gitter.im&#x2F;theme-next"><i class="fa fa-fw fa-github-alt"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly9yaW90LmltL2FwcC8jL3Jvb20vI05leFQ6bWF0cml4Lm9yZw==" title="Riot → https:&#x2F;&#x2F;riot.im&#x2F;app&#x2F;#&#x2F;room&#x2F;#NexT:matrix.org"><i class="fa fa-fw fa-bullhorn"></i></span>
+      </span>
+      <span class="links-of-author-item">
+        <span class="exturl" data-url="aHR0cHM6Ly90Lm1lL3RoZW1lX25leHQ=" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;theme_next"><i class="fa fa-fw fa-telegram"></i></span>
+      </span>
+  </div>
+
+
+<div class="cc-license motion-element" itemprop="sponsor">
+  <span class="exturl cc-opacity" title="Deploy with Netlify → https://www.netlify.com" data-url="aHR0cHM6Ly93d3cubmV0bGlmeS5jb20="><img width="80" src="https://www.netlify.com/img/global/badges/netlify-dark.svg" alt="Netlify"></span>
+</div>
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl theme-link" data-url="aHR0cHM6Ly9waXNjZXMudGhlbWUtbmV4dC5vcmc=">NexT.Pisces</span> 强力驱动
+  </div><div class="footer-custom">
+Theme source code <span class="exturl theme-link" data-url="aHR0cHM6Ly9naXRodWIuY29tL3RoZW1lLW5leHQvaGV4by10aGVtZS1uZXh0">here</span><br>
+Website source code <span class="exturl theme-link" data-url="aHR0cHM6Ly9naXRodWIuY29tL3RoZW1lLW5leHQvdGhlbWUtbmV4dC5vcmc=">here</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://theme-next.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://blog.coocn.cn/2020/03/25/golang-micro-1/";
+    this.page.identifier = "2020/03/25/golang-micro-1/";
+    this.page.title = "Golang 微服务框架系列 - 1， Micro 框架使用方式以及架构介绍";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://theme-next.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>
