@@ -20,19 +20,19 @@
     var CONFIG = {"hostname":"blog.coocn.cn","root":"/","scheme":"Pisces","version":"7.7.2","exturl":true,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="缘由可能由于科学上网次数过多，发现公司网络被重点照顾了，v2ray和ssserver 都无法正常科学上网，所以想到了如下这个骚办法。  通过 SSH 隧道加上 ssserver 来达到绕过我墙对 ssserver 的封锁；为啥用 ssserver 呢，因为 ssserver 简单，好启动。  启动服务器此处只监听127.0.0.1避免被防火墙嗅探到外网端口。由于是使用ssh tunnel 访问，所">
-<meta property="og:type" content="article">
-<meta property="og:title" content="使用 docker 通过 ssh tunnel + shadowoscks 绕过我墙实现科学上网">
-<meta property="og:url" content="http://blog.coocn.cn/2020/03/25/docker-ssserver/index.html">
+  <meta name="description" content="这里是渡渡岛，渡渡岛上有渡渡鸟以及上班偷懒的木制饭桶~">
+<meta property="og:type" content="website">
+<meta property="og:title" content="tags">
+<meta property="og:url" content="http://blog.coocn.cn/tags/index.html">
 <meta property="og:site_name" content="渡渡岛">
-<meta property="og:description" content="缘由可能由于科学上网次数过多，发现公司网络被重点照顾了，v2ray和ssserver 都无法正常科学上网，所以想到了如下这个骚办法。  通过 SSH 隧道加上 ssserver 来达到绕过我墙对 ssserver 的封锁；为啥用 ssserver 呢，因为 ssserver 简单，好启动。  启动服务器此处只监听127.0.0.1避免被防火墙嗅探到外网端口。由于是使用ssh tunnel 访问，所">
+<meta property="og:description" content="这里是渡渡岛，渡渡岛上有渡渡鸟以及上班偷懒的木制饭桶~">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-03-25T02:24:52.000Z">
-<meta property="article:modified_time" content="2020-03-25T02:27:05.613Z">
+<meta property="article:published_time" content="2020-03-25T02:57:21.000Z">
+<meta property="article:modified_time" content="2020-03-25T02:57:33.335Z">
 <meta property="article:author" content="木制饭桶">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://blog.coocn.cn/2020/03/25/docker-ssserver/">
+<link rel="canonical" href="http://blog.coocn.cn/tags/">
 
 
 <script id="page-configurations">
@@ -40,12 +40,13 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : true,
+    isPost : false,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>使用 docker 通过 ssh tunnel + shadowoscks 绕过我墙实现科学上网 | 渡渡岛</title>
+  <title>tags | 渡渡岛
+</title>
   
 
 
@@ -203,117 +204,52 @@
       <div class="main-inner">
         <div class="content-wrap">
           
+  
+  
 
-          <div class="content post">
+          <div class="content page">
             
 
   <div class="posts-expand">
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.coocn.cn/2020/03/25/docker-ssserver/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/apple-touch-icon-next.png">
-      <meta itemprop="name" content="木制饭桶">
-      <meta itemprop="description" content="这里是渡渡岛，渡渡岛上有渡渡鸟以及上班偷懒的木制饭桶~">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="渡渡岛">
-    </span>
+    
+    
+    
+    <div class="post-block" lang="zh-CN">
       <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          使用 docker 通过 ssh tunnel + shadowoscks 绕过我墙实现科学上网
-        </h1>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
+<h1 class="post-title" itemprop="name headline">tags
+</h1>
 
-              <time title="创建时间：2020-03-25 10:24:52 / 修改时间：10:27:05" itemprop="dateCreated datePublished" datetime="2020-03-25T10:24:52+08:00">2020-03-25</time>
-            </span>
-
-          
-            <span id="/2020/03/25/docker-ssserver/" class="post-meta-item leancloud_visitors" data-flag-title="使用 docker 通过 ssh tunnel + shadowoscks 绕过我墙实现科学上网" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/03/25/docker-ssserver/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/03/25/docker-ssserver/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
+<div class="post-meta">
   
 
-        </div>
-      </header>
+</div>
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+</header>
 
       
-        <h1 id="缘由"><a href="#缘由" class="headerlink" title="缘由"></a>缘由</h1><p>可能由于科学上网次数过多，发现公司网络被重点照顾了，v2ray和ssserver 都无法正常科学上网，所以想到了如下这个骚办法。</p>
-<blockquote>
-<p>通过 SSH 隧道加上 ssserver 来达到绕过我墙对 ssserver 的封锁；为啥用 ssserver 呢，因为 ssserver 简单，好启动。</p>
-</blockquote>
-<h1 id="启动服务器"><a href="#启动服务器" class="headerlink" title="启动服务器"></a>启动服务器</h1><p>此处只监听<code>127.0.0.1</code>避免被防火墙嗅探到外网端口。由于是使用ssh tunnel 访问，所以端口不对外也没有任何问题。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p &quot;127.0.0.1:8388:8388&quot;-e &quot;METHOD&#x3D;xchacha20-ietf-poly1305&quot; -e &quot;PASSWORD&#x3D;&lt;password&gt;&quot; -e &quot;SERVER_ADDR&#x3D;0.0.0.0&quot; -e &quot;SERVER_PORT&#x3D;8388&quot; shadowsocks&#x2F;shadowsocks-libev</span><br></pre></td></tr></table></figure>
-
-<h1 id="启动客户端"><a href="#启动客户端" class="headerlink" title="启动客户端"></a>启动客户端</h1><h2 id="1-启动端口转发"><a href="#1-启动端口转发" class="headerlink" title="1. 启动端口转发"></a>1. 启动端口转发</h2><p>启动时指定名称为 <code>ss-tunnel</code>，因为 ss 客户端 需要连接这个容器。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run  -d --name ss-tunnel -v &#x2F;ssh&#x2F;:&#x2F;root&#x2F;.ssh ssoor&#x2F;ssh-tunnel ssh -CNTL 0.0.0.0:8388:127.0.0.1:8388 root@&lt;SERVER_IP&gt;</span><br></pre></td></tr></table></figure>
-<h2 id="2-启动-SS-客户端"><a href="#2-启动-SS-客户端" class="headerlink" title="2. 启动 SS 客户端"></a>2. 启动 SS 客户端</h2><p>监听本地 1080 端口对外提供服务，<code>--link ss-tunnel</code> 表示要使用名称访问 <code>ss-tunnel</code> 容器 (<code>ss-local -s ss-tunnel -p 8388</code>)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --link ss-tunnel -p 1080:1080 shadowsocks&#x2F;shadowsocks-libev ss-local -s ss-tunnel -p 8388 -b 0.0.0.0 -l 1080 -m xchacha20-ietf-poly1305 -k &lt;password&gt;</span><br></pre></td></tr></table></figure>
-
-<h1 id="愉快的玩耍"><a href="#愉快的玩耍" class="headerlink" title="愉快的玩耍"></a>愉快的玩耍</h1><p>现在可以设置 <code>SOCKS5</code> 代理 愉快的玩耍了。<br>比如使用GIT拉源码:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HTTPS_PROXY&#x3D;socks5:&#x2F;&#x2F;127.0.0.1:1080 git clone https:&#x2F;&#x2F;github.com&#x2F;golang&#x2F;go</span><br></pre></td></tr></table></figure>
-    </div>
-
-    
-    
-    
-
-      <footer class="post-footer">
-
+      
+      
+      <div class="post-body">
+          <div class="tag-cloud">
+            <div class="tag-cloud-title">
+              目前共计 3 个标签
+            </div>
+            <div class="tag-cloud-tags">
+              <a href="/tags/git/" style="font-size: 12px; color: #ccc">git</a> <a href="/tags/repo/" style="font-size: 12px; color: #ccc">repo</a> <a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 12px; color: #ccc">微服务</a>
+            </div>
+          </div>
         
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2020/03/25/git-clone-depth/" rel="prev" title="在 git clone 时添加了 --depth 后，如何重新拉取所有全部的历史来获取完整的仓库">
-      <i class="fa fa-chevron-left"></i> 在 git clone 时添加了 --depth 后，如何重新拉取所有全部的历史来获取完整的仓库
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/03/25/c-setlocale/" rel="next" title="setlocale(LC_ALL,"") 中的 LC_* 是什么意思，以及 LANGUAGE/LANG 具体含义说明">
-      setlocale(LC_ALL,"") 中的 LC_* 是什么意思，以及 LANGUAGE/LANG 具体含义说明 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      </div>
+      
+      
+      
     </div>
-      </footer>
     
-  </article>
-  
-  
-  
 
+    
+    
+    
   </div>
 
 
@@ -366,7 +302,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#缘由"><span class="nav-number">1.</span> <span class="nav-text">缘由</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#启动服务器"><span class="nav-number">2.</span> <span class="nav-text">启动服务器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#启动客户端"><span class="nav-number">3.</span> <span class="nav-text">启动客户端</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-启动端口转发"><span class="nav-number">3.1.</span> <span class="nav-text">1. 启动端口转发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-启动-SS-客户端"><span class="nav-number">3.2.</span> <span class="nav-text">2. 启动 SS 客户端</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#愉快的玩耍"><span class="nav-number">4.</span> <span class="nav-text">愉快的玩耍</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
