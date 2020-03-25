@@ -24,12 +24,12 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="通过 coredns 给 kubernetes 添加自定义DNS解析记录">
 <meta property="og:url" content="http://blog.coocn.cn/2020/03/25/k8s-coredns-add-hosts/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="渡渡岛">
 <meta property="og:description" content="解决方案coredns 允许通过自带的 hosts 插件像配置本地hosts文件一样添加自定义dns解析。  通过 ConfigMap 添加自定义解析通过在命名空间 kube-system 中找到类型为 configMap ，名称为 coredns 的配置文件配置。在配置中添加如下设置就能将我们的自定义解析添加到coredns中。文中将 redis 和 redis.connect.co 解析到地址">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-03-25T01:52:36.000Z">
 <meta property="article:modified_time" content="2020-03-25T02:01:18.958Z">
-<meta property="article:author" content="John Doe">
+<meta property="article:author" content="木制饭桶">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="http://blog.coocn.cn/2020/03/25/k8s-coredns-add-hosts/">
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>通过 coredns 给 kubernetes 添加自定义DNS解析记录 | Hexo</title>
+  <title>通过 coredns 给 kubernetes 添加自定义DNS解析记录 | 渡渡岛</title>
   
 
 
@@ -96,9 +96,10 @@
 
     <a href="/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">Hexo</h1>
+      <h1 class="site-title">渡渡岛</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
+      <p class="site-subtitle" itemprop="description">Nieml's Blog</p>
   </div>
 
   <div class="site-nav-right">
@@ -215,12 +216,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/apple-touch-icon-next.png">
-      <meta itemprop="name" content="John Doe">
-      <meta itemprop="description" content="">
+      <meta itemprop="name" content="木制饭桶">
+      <meta itemprop="description" content="这里是渡渡岛，渡渡岛上有渡渡鸟以及上班偷懒的木制饭桶~">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
+      <meta itemprop="name" content="渡渡岛">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -362,10 +363,10 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <img class="site-author-image" itemprop="image" alt="John Doe"
+    <img class="site-author-image" itemprop="image" alt="木制饭桶"
       src="/images/apple-touch-icon-next.png">
-  <p class="site-author-name" itemprop="name">John Doe</p>
-  <div class="site-description" itemprop="description"></div>
+  <p class="site-author-name" itemprop="name">木制饭桶</p>
+  <div class="site-description" itemprop="description">这里是渡渡岛，渡渡岛上有渡渡鸟以及上班偷懒的木制饭桶~</div>
 </div>
 <div class="site-state-wrap motion-element">
   <nav class="site-state">
@@ -434,7 +435,7 @@
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">John Doe</span>
+  <span class="author" itemprop="copyrightHolder">木制饭桶</span>
 </div>
   <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & <span class="exturl theme-link" data-url="aHR0cHM6Ly9waXNjZXMudGhlbWUtbmV4dC5vcmc=">NexT.Pisces</span> 强力驱动
   </div><div class="footer-custom">
